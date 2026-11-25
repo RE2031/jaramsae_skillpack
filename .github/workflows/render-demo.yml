@@ -1,0 +1,27 @@
+name: Render demo feed
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/render-demo.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Render and verify demo
+        run: python scripts/pipeline.py examples/demo.json --out output/demo-v04
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jaramsae-v04-demo
+          path: output/demo-v04/
+          if-no-files-found: error
+          retention-days: 7
