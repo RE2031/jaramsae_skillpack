@@ -1,17 +1,35 @@
 ---
 name: instagram-feed-creator
-description: 기관 전용 한국어 인스타그램을 사진 중심 전문 편집 디자인으로 제작한다.
+description: 기관 전용 한국어 인스타그램을 사진과 정보가 균형 잡힌 에디토리얼 디자인으로 제작한다.
 ---
 # instagram-feed-creator
 
 1. brand-identity와 style-direction으로 기관 목적, 독자, 브랜드 및 확인된 사실을 정리한다.
-2. reference-analysis와 references/sunlit-editorial.md를 읽는다. 기본 스타일은 sunlit-editorial, 기관 요청 우선.
-3. visual-curation으로 사진을 확보한다. 이미지 생성 도구가 있으면 글자 없는 배경 사진을 생성한다. 생성 사진은 실제 기관으로 오인시키지 않는다. 없으면 텍스트 중심으로 전환한다.
-4. feed-planning, editorial-copywriting, post-composition을 적용한다. 단일 요청에는 1개, 전체 피드에는 기본 9개. 대표 표지 한 장의 완성도를 먼저 확보한다.
-5. anti-ai-aesthetic를 적용하여 JSON 작성. schemas/feed.schema.json을 따른다. 사진은 JSON 기준 상대 경로, image_approved는 사용 권한을 확인한 경우만 true.
-6. pipeline-execution을 반드시 읽고 실행한다. AI 콘텐츠 JSON과 이미지 파일을 준비한 뒤 `python scripts/pipeline.py INPUT.json --out output/고유한-작업명`을 실제 터미널에서 실행한다.
-7. 파이프라인 성공 및 quality_check 통과를 확인한다. visual-critique와 feed-review로 실제 PNG를 열어 검토하고 발견된 문제를 수정한다.
-8. PNG 개수와 1080×1350 크기, HTML/CSS 존재를 확인한 후 결과물 경로와 사진 출처, 검수 상태를 전달한다. 자동 게시 금지.
+2. reference-analysis와 references/sunlit-editorial.md, references/styles/editorial-hybrid.json을 읽는다. 기관 고유 브랜드 요청이 없다면 기본 스타일은 editorial-hybrid다.
+3. visual-curation으로 사진을 확보한다. 실제 기관 사진은 공개 및 외부 AI 전송 권한을 확인한다. 이미지 생성 도구가 있으면 장면별로 서로 다른 사진 소재를 준비하되, 생성 사진을 실제 기관이나 원아 사진으로 오인시키지 않는다. 사진이 없으면 승인된 대체 소재를 요청하거나 사진 없는 레이아웃을 사용한다.
+4. feed-planning, editorial-copywriting, post-composition을 적용한다. 단일 요청에는 1개, 전체 피드에는 기본 9개. 사용자가 지정한 개수와 슬라이드 수를 우선한다.
+5. editorial-hybrid 기본값은 사진과 텍스트의 균형이다. 사진으로 활동과 기관 분위기를 보여주고, 큰 제목과 짧고 구체적인 설명으로 학부모가 활동의 의미를 이해하게 한다. 한 장에 하나의 핵심 메시지를 둔다.
+6. anti-ai-aesthetic를 적용해 JSON 작성. schemas/feed.schema.json을 따른다. 사진은 JSON 기준 상대 경로, image_approved는 사용 권한을 확인한 경우만 true.
+7. pipeline-execution을 반드시 읽고 실행한다. AI 콘텐츠 JSON과 이미지 파일을 준비한 뒤 `python scripts/pipeline.py INPUT.json --out output/고유한-작업명`을 실제 터미널에서 실행한다.
+8. 파이프라인 성공 및 quality_check 통과를 확인한다. visual-critique와 feed-review로 실제 PNG를 열어 기술 품질, 디자인, 정보 전달, 사실/권한을 각각 검토하고 발견된 문제를 수정한다.
+9. PNG 개수와 1080×1350 크기, HTML/CSS 존재, 독립형 preview.html을 확인한 후 결과물 경로와 사진 출처, 검수 상태를 전달한다. 자동 게시 금지.
 
-## v0.4 품질 지침
-캐러셀 안에서 레이아웃과 사진 거리/각도를 다양화한다. 사용자가 좋다고 평가한 자연스러운 한국어 카피 톤은 유지한다. preview.html은 이미지가 base64로 내장된 독립 파일이어야 한다. 이미지 표시 누락 시 완료 처리하지 않는다.
+## 기본 출력 스타일: Editorial Hybrid
+사진만 많은 포토 매거진이나 텍스트만 많은 정보 카드뉴스가 아니라, 사진과 정보를 균형 있게 사용하는 기관 전용 에디토리얼 스타일이다.
+- 기본 목표 비율은 사진 50% / 텍스트 50% 정도로 시작하되, 슬라이드별 목적에 맞춰 유연하게 조정한다. 이는 픽셀 면적의 엄격한 계산이 아니라 시각적 비중의 가이드다.
+- 사진은 실제 활동의 분위기와 맥락을 전달한다.
+- 텍스트는 활동 내용, 놀이 과정, 학부모가 이해할 수 있는 교육적 의미를 짧고 구체적으로 설명한다.
+- 큰 한국어 제목, 명확한 위계, 충분한 여백으로 전문성을 표현한다.
+- 사진만 보여주고 정보가 없는 슬라이드가 연속되지 않도록 한다.
+- 설명만 길게 이어지는 텍스트 슬라이드도 연속되지 않도록 한다.
+- 감성 문구만 반복하지 말고 실제 활동과 확인된 사실을 바탕으로 쓴다.
+
+## 기본 4장 캐러셀 흐름
+사용자가 별도 구성을 지정하지 않았을 때 참고한다. 모든 게시물에 기계적으로 강제하지 않는다.
+1. Cover: 활동을 한눈에 보여주는 대표 사진, 큰 제목, 한 줄 부제.
+2. Activity detail: 손·재료·과정 등 클로즈업 사진, 활동 과정을 설명하는 짧은 문장.
+3. Meaning: 놀이/활동에서 관찰된 경험과 학부모가 이해할 수 있는 의미. 텍스트 비중을 조금 높여도 되며 사진은 보조로 사용한다.
+4. Closing: 완성 작품 또는 자연스러운 마무리 장면, 과장 없는 정리 문구.
+
+## v0.5 Editorial Hybrid
+사용자가 선호한 기본 방향은 사진과 정보의 균형이다. 카피라이팅의 자연스러운 톤은 유지하고 디자인과 사진의 완성도를 우선 개선한다. 학습 효과, 발달 효과, 성취를 단정하지 말고 기관이 제공한 사실이나 실제 관찰에 근거해 표현한다.
