@@ -1,0 +1,65 @@
+{
+  "name": "editorial-hybrid",
+  "version": "1.0",
+  "purpose": "기관의 활동 사진과 학부모에게 필요한 설명을 균형 있게 전달하는 인스타그램 에디토리얼 스타일",
+  "mood": [
+    "warm",
+    "professional",
+    "friendly",
+    "informative",
+    "editorial"
+  ],
+  "palette": {
+    "primary": "#302D25",
+    "background": "#F7F3EA",
+    "accent": "#788052"
+  },
+  "visual_balance": {
+    "photo": 50,
+    "text": 50,
+    "note": "권장 시각적 비중이며 고정 픽셀 비율이 아니다. 각 슬라이드 목적에 맞춰 유연하게 조정한다."
+  },
+  "typography": {
+    "headline": "큰 한국어 제목, 필요시 명조 계열",
+    "body": "모바일에서 읽기 쉬운 산세리프 본문",
+    "hierarchy": "제목-설명-보조 정보 순으로 명확하게 구분"
+  },
+  "photo_direction": [
+    "실제 활동 맥락이 드러나는 자연스러운 장면",
+    "원경·중경·클로즈업을 섞어 촬영 거리 다양화",
+    "자연광과 실제 공간의 질감 활용",
+    "사진과 텍스트가 서로 보완하도록 구성"
+  ],
+  "layout_sequence": {
+    "default_carousel_4": [
+      "hero-left-copy 또는 split-photo",
+      "detail-photo 또는 photo-caption",
+      "text-interlude 또는 split-editorial",
+      "split-photo 또는 fullbleed-photo"
+    ],
+    "guidance": "기본 참고 흐름이다. 모든 게시물에 고정하지 말고 확보된 사진과 콘텐츠 목적에 맞게 선택한다."
+  },
+  "content_rules": [
+    "한 슬라이드에 하나의 핵심 메시지",
+    "활동 내용과 학부모가 이해할 수 있는 의미를 짧고 구체적으로 설명",
+    "실제 관찰이나 확인된 기관 정보에 근거",
+    "감성 문구만 반복하지 않기",
+    "사진-only 및 텍스트-only 슬라이드 연속 방지"
+  ],
+  "avoid": [
+    "사진만 나열하는 캐러셀",
+    "긴 본문과 과도한 정보 밀도",
+    "동일 레이아웃 및 동일 구도 반복",
+    "의미 없는 아이콘·도형",
+    "근거 없는 발달 효과 단정",
+    "생성 이미지를 실제 원아/시설 사진으로 오인시키기"
+  ],
+  "accessibility": {
+    "mobile_readability": true,
+    "safe_margin_px": 84,
+    "canvas_px": [
+      1080,
+      1350
+    ]
+  }
+}
