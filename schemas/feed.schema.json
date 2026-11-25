@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "institution",
+    "goal",
+    "style",
+    "brand",
+    "draft",
+    "posts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "institution": {
+      "type": "string",
+      "minLength": 1
+    },
+    "goal": {
+      "type": "string"
+    },
+    "style": {
+      "enum": [
+        "photo-lifestyle",
+        "emotional-editorial",
+        "modern-magazine",
+        "minimal-information"
+      ]
+    },
+    "brand": {
+      "type": "object",
+      "required": [
+        "primary",
+        "background",
+        "accent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "background": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "draft": {
+      "type": "boolean"
+    },
+    "posts": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "required": [
+          "category",
+          "purpose",
+          "caption",
+          "hashtags",
+          "slides"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "slides": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title",
+                "body",
+                "layout"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "maxLength": 180
+                },
+                "layout": {
+                  "enum": [
+                    "photo",
+                    "editorial",
+                    "magazine",
+                    "info",
+                    "quote",
+                    "checklist"
+                  ]
+                },
+                "image": {
+                  "type": "string"
+                },
+                "image_approved": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "minItems": 1,
+            "maxItems": 6,
+            "not": {
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        }
+      }
+    }
+  }
+}
