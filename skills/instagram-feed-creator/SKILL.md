@@ -1,11 +1,14 @@
 ---
 name: instagram-feed-creator
-description: 기관의 자연어 요청을 받아 한국어 인스타그램 피드와 카드뉴스를 제작한다.
+description: 기관 전용 한국어 인스타그램을 사진 중심 전문 편집 디자인으로 제작한다.
 ---
 # instagram-feed-creator
 
-1. `brand-identity`, `reference-analysis`를 읽고 기관명·목표·대상·톤·자료를 정리한다. 필수 정보가 없으면 기관명/목표/공개 허가 사진 여부를 한 번에 확인하거나 가상 초안으로 명시한다.
-2. `feed-planning`으로 9개 게시물을 계획한다. `cardnews-copywriting`과 `cardnews-design`으로 각 게시물의 슬라이드를 작성한다.
-3. `schemas/feed.schema.json`과 `examples/demo.json` 형식에 맞는 JSON을 작업 폴더에 저장한다. 사진 파일은 JSON 위치 기준 상대 경로로 지정한다. `feed-review`로 사전 검수한다.
-4. `export`를 실행한다. 실제 PNG와 피드 미리보기를 열어 검수하고 실패 시 수정 후 새 폴더로 다시 출력한다.
-5. 사용자에게 결과물 경로, 미확인 사실, 검수 결과, 게시 승인 필요 여부를 전달한다. 자동 게시하지 않는다.
+1. brand-identity와 style-direction으로 기관 목적, 독자, 브랜드 및 확인된 사실을 정리한다.
+2. reference-analysis와 references/sunlit-editorial.md를 읽는다. 기본 스타일은 sunlit-editorial, 기관 요청 우선.
+3. visual-curation으로 사진을 확보한다. 이미지 생성 도구가 있으면 글자 없는 배경 사진을 생성한다. 생성 사진은 실제 기관으로 오인시키지 않는다. 없으면 텍스트 중심으로 전환한다.
+4. feed-planning, editorial-copywriting, post-composition을 적용한다. 단일 요청에는 1개, 전체 피드에는 기본 9개. 대표 표지 한 장의 완성도를 먼저 확보한다.
+5. anti-ai-aesthetic를 적용하여 JSON 작성. schemas/feed.schema.json을 따른다. 사진은 JSON 기준 상대 경로, image_approved는 사용 권한을 확인한 경우만 true.
+6. export로 PNG와 편집 가능한 HTML/CSS를 생성한다. 필요한 경우 HTML/CSS를 직접 수정하고 --rerender한다.
+7. visual-critique와 feed-review로 실제 출력 이미지를 열어 검토하고 발견된 문제를 수정한다. 이미지 열람 도구가 없다면 미검토로 명시한다.
+8. 결과물, 사진 출처 및 권한, 검수와 한계를 전달한다. 자동 게시 금지.

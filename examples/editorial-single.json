@@ -1,0 +1,32 @@
+{
+  "institution": "햇살숲 어린이집 (가상)",
+  "goal": "입소 상담 디자인 예시",
+  "style": "sunlit-editorial",
+  "brand": {
+    "primary": "#3F372F",
+    "background": "#F6F0E7",
+    "accent": "#687845"
+  },
+  "draft": true,
+  "posts": [
+    {
+      "category": "2027 모집 안내 · 예시",
+      "purpose": "가상 디자인 검토",
+      "caption": "가상 예시이며 실제 모집 정보는 확인 필요.",
+      "hashtags": [
+        "#어린이집"
+      ],
+      "slides": [
+        {
+          "title": "아이의 첫 시작,\n따뜻한 공간에서",
+          "body": "어린이집을 알아보는 부모님께.\n우리 아이에게 맞는 공간을 직접 만나보세요.",
+          "layout": "quiet-cover",
+          "details": [
+            "2027년 입소 상담 · 예시",
+            "실제 모집 대상과 일정은 확인 필요"
+          ]
+        }
+      ]
+    }
+  ]
+}

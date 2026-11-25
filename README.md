@@ -1,4 +1,4 @@
-# Instagram Feed Skill Pack
+# Instagram Feed Skill Pack v0.2
 한국어 보육기관 인스타그램 피드 제작용 Agent Skills + 렌더러. 원장의 자연어 요청을 받은 AI 에이전트가 콘텐츠 JSON을 작성하고, 로컬 렌더러가 편집 가능한 HTML/CSS와 PNG를 생성한다. 자체 서비스 홍보 및 자동 게시 기능은 범위 밖이다.
 
 ## 빠른 시작
@@ -22,10 +22,17 @@ Windows에서도 동일하게 실행한다. 시스템 Chromium을 사용하려�
 - `modern-magazine`: 강한 헤드라인과 편집형 구성
 - `minimal-information`: 정보 전달 및 체크리스트
 
-브랜드의 일반적인 시각 문법을 참고했으며 제3자 로고·사진·고유 템플릿을 포함하지 않는다. 사진은 기관이 공개 홍보 권한을 확인한 로컬 파일만 사용한다. 사진이 없으면 도형 기반 디자인으로 대체한다.
+브랜드의 일반적인 시각 문법을 참고했으며 제3자 로고·사진·고유 템플릿을 포함하지 않는다. 사진은 기관이 공개 홍보 권한을 확인한 로컬 파일만 사용한다. 사진이 없으면 텍스트 중심 디자인으로 전환한다.
 
 ## 결과물
 `editable/index.html`, `editable/style.css`, `editable/feed.json`, `editable/assets/`, `png/post-01-slide-01.png` 등, `preview.html`, `captions.md`, `review-report.json`. JSON을 수정한 후 재실행하거나 HTML/CSS를 직접 수정할 수 있다. HTML 직접 수정 후에는 `--rerender`로 PNG를 재생성한다.
 
 ## 범위와 제한
 AI 콘텐츠 생성은 에이전트가 담당한다. 렌더러 자체는 LLM이나 사진 검색 API를 호출하지 않는다. 데모는 가상 기관이며 게시 금지. 자동 검수는 규격·텍스트 넘침·이미지 로딩·구조 검사 중심이며, 실제 사실과 개인정보 및 디자인 품질은 사람이 승인해야 한다. 자동 게시하지 않는다. 출력 폴더는 새 경로를 사용한다(기존 폴더 덮어쓰기 방지).
+
+## v0.2 사진 중심 에디토리얼
+승인된 디자인 방향은 references/sunlit-editorial.md. 신규 스타일 sunlit-editorial, quiet-premium, warm-lifestyle. 신규 레이아웃 hero-left-copy, hero-right-copy, split-editorial, photo-caption, quiet-cover, minimal-announcement. 1~9개 게시물을 지원한다. 대표 게시물 한 장부터 검토한다.
+```bash
+python scripts/render.py examples/editorial-single.json --out output/editorial
+```
+위 예시는 사진 없는 데모. 사진형은 승인 사진 파일을 JSON 옆에 놓고 image, image_approved, image_kind, image_credit, image_position을 지정하고 hero-left-copy를 사용한다. 생성/스톡 이미지는 실제 기관이 아님을 표시한다. 렌더러 자체는 이미지 생성 API를 호출하지 않는다. 이미지 생성 가능 에이전트가 별도로 소재를 준비한다. Noto Serif CJK KR 또는 바탕 서체 권장.

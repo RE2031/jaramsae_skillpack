@@ -23,7 +23,10 @@
         "photo-lifestyle",
         "emotional-editorial",
         "modern-magazine",
-        "minimal-information"
+        "minimal-information",
+        "sunlit-editorial",
+        "quiet-premium",
+        "warm-lifestyle"
       ]
     },
     "brand": {
@@ -54,7 +57,7 @@
     },
     "posts": {
       "type": "array",
-      "minItems": 9,
+      "minItems": 1,
       "maxItems": 9,
       "items": {
         "type": "object",
@@ -109,7 +112,13 @@
                     "magazine",
                     "info",
                     "quote",
-                    "checklist"
+                    "checklist",
+                    "hero-left-copy",
+                    "hero-right-copy",
+                    "split-editorial",
+                    "quiet-cover",
+                    "photo-caption",
+                    "minimal-announcement"
                   ]
                 },
                 "image": {
@@ -117,6 +126,34 @@
                 },
                 "image_approved": {
                   "type": "boolean"
+                },
+                "details": {
+                  "type": "array",
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string",
+                    "maxLength": 48
+                  }
+                },
+                "image_position": {
+                  "enum": [
+                    "left",
+                    "center",
+                    "right",
+                    "top",
+                    "bottom"
+                  ]
+                },
+                "image_credit": {
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "image_kind": {
+                  "enum": [
+                    "institution",
+                    "stock",
+                    "generated"
+                  ]
                 }
               }
             },
