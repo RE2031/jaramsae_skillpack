@@ -39,6 +39,12 @@ def build(src,out):
     (edit/'index.html').write_text('<!doctype html><html lang="ko"><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head><body>'+''.join(blocks)+'</body></html>',encoding='utf-8')
     (edit/'feed.json').write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
     (out/'captions.md').write_text('\n'.join(captions),encoding='utf-8')
+    sources=['# 이미지 출처 및 사용 권한','']
+    for i,post in enumerate(data['posts'],1):
+        for j,s in enumerate(post['slides'],1):
+            if s.get('image'):
+                sources.append(f'- {i:02d}-{j:02d}: {s.get("image_credit") or "기관 제공 이미지 (사용 권한 별도 확인)"}')
+    (out/'sources.md').write_text('\n'.join(sources)+'\n',encoding='utf-8')
 
 def render(out,browser_path):
     png=out/'png'; png.mkdir(exist_ok=True)

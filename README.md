@@ -1,4 +1,4 @@
-# Instagram Feed Skill Pack v0.2
+# Instagram Feed Skill Pack v0.3
 한국어 보육기관 인스타그램 피드 제작용 Agent Skills + 렌더러. 원장의 자연어 요청을 받은 AI 에이전트가 콘텐츠 JSON을 작성하고, 로컬 렌더러가 편집 가능한 HTML/CSS와 PNG를 생성한다. 자체 서비스 홍보 및 자동 게시 기능은 범위 밖이다.
 
 ## 빠른 시작
@@ -6,7 +6,7 @@ Python 3.10+ 및 한국어 폰트(Noto Sans CJK KR 또는 맑은 고딕)를 설�
 ```bash
 python -m pip install -r requirements.txt
 python -m playwright install chromium
-python scripts/render.py examples/demo.json --out output/demo
+python scripts/pipeline.py examples/demo.json --out output/demo
 ```
 Windows에서도 동일하게 실행한다. 시스템 Chromium을 사용하려면 `--browser /path/to/chromium`을 추가한다. `output/demo/preview.html`을 브라우저에서 열면 피드와 슬라이드를 확인할 수 있다.
 
