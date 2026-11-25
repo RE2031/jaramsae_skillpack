@@ -30,9 +30,19 @@ Windows에서도 동일하게 실행한다. 시스템 Chromium을 사용하려�
 ## 범위와 제한
 AI 콘텐츠 생성은 에이전트가 담당한다. 렌더러 자체는 LLM이나 사진 검색 API를 호출하지 않는다. 데모는 가상 기관이며 게시 금지. 자동 검수는 규격·텍스트 넘침·이미지 로딩·구조 검사 중심이며, 실제 사실과 개인정보 및 디자인 품질은 사람이 승인해야 한다. 자동 게시하지 않는다. 출력 폴더는 새 경로를 사용한다(기존 폴더 덮어쓰기 방지).
 
+## v0.3 실행 자동화 파이프라인
+AI 에이전트는 콘텐츠 JSON과 승인/생성 이미지 파일을 준비한 뒤 반드시 아래 명령으로 전체 과정을 실행한다.
+```bash
+python scripts/pipeline.py path/to/feed.json --out output/unique-job-name
+```
+파이프라인은 환경 사전 검사 → Chromium/의존성 확인 → JSON 검증 및 HTML/CSS 렌더링 → 개별 PNG 출력 → 결과물 검증 순으로 진행한다. 실패하면 0이 아닌 종료 코드를 반환하며 완료라고 보고하면 안 된다. HTML/CSS 수정 후에는 `python scripts/render.py --rerender --out output/unique-job-name` 및 `python scripts/quality_check.py --out output/unique-job-name`을 실행한다.
+
+### 출력물과 이미지 생성의 경계
+렌더러는 LLM 또는 이미지 생성/검색 API를 호출하지 않는다. 콘텐츠 JSON과 이미지 파일은 에이전트가 먼저 준비해야 한다. 에이전트에 이미지 생성 도구가 없으면 기관 승인 사진을 사용하거나 텍스트 중심 레이아웃으로 진행한다. 파이프라인 성공 시 편집 가능한 HTML/CSS/JSON, 캡션, 출처 메모, 개별 PNG와 미리보기를 만든다.
+
 ## v0.2 사진 중심 에디토리얼
 승인된 디자인 방향은 references/sunlit-editorial.md. 신규 스타일 sunlit-editorial, quiet-premium, warm-lifestyle. 신규 레이아웃 hero-left-copy, hero-right-copy, split-editorial, photo-caption, quiet-cover, minimal-announcement. 1~9개 게시물을 지원한다. 대표 게시물 한 장부터 검토한다.
 ```bash
-python scripts/render.py examples/editorial-single.json --out output/editorial
+python scripts/pipeline.py examples/editorial-single.json --out output/editorial
 ```
 위 예시는 사진 없는 데모. 사진형은 승인 사진 파일을 JSON 옆에 놓고 image, image_approved, image_kind, image_credit, image_position을 지정하고 hero-left-copy를 사용한다. 생성/스톡 이미지는 실제 기관이 아님을 표시한다. 렌더러 자체는 이미지 생성 API를 호출하지 않는다. 이미지 생성 가능 에이전트가 별도로 소재를 준비한다. Noto Serif CJK KR 또는 바탕 서체 권장.

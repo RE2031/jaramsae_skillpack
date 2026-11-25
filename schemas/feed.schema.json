@@ -158,11 +158,7 @@
               }
             },
             "minItems": 1,
-            "maxItems": 6,
-            "not": {
-              "minItems": 2,
-              "maxItems": 2
-            }
+            "maxItems": 6
           }
         }
       }

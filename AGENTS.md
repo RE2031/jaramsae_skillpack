@@ -3,3 +3,7 @@
 
 ## v0.2
 style-direction → visual-curation → editorial-copywriting → post-composition → anti-ai-aesthetic → 렌더 → visual-critique 순서. references/sunlit-editorial.md 기준. 단일 게시물을 9개로 강제하지 않는다.
+
+
+## 실행 필수 조건 (v0.3)
+콘텐츠 제작 후 반드시 `skills/pipeline-execution/SKILL.md`를 읽고 실행한다. 터미널 도구가 있으면 `python scripts/pipeline.py INPUT.json --out output/고유명`을 실제 실행한다. 실행하지 않았거나 실패했다면 HTML/PNG 생성 완료라고 말하지 않는다. 파이프라인 성공 후 quality_check 결과와 파일을 확인한다.
