@@ -4,6 +4,15 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/render-demo.yml'
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'requirements.txt'
+      - 'scripts/**'
+      - 'templates/**'
+      - 'schemas/**'
+      - 'skills/**'
+      - 'references/**'
+      - 'examples/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,14 +25,14 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -r requirements.txt
+      - name: Check style preset consistency
+        run: python scripts/test_style_presets.py
       - run: python -m playwright install --with-deps chromium
       - name: Render and verify demo
-        run: python scripts/pipeline.py examples/demo.json --out output/demo-v04
+        run: python scripts/pipeline.py examples/demo.json --out output/demo-v06
       - uses: actions/upload-artifact@v4
         with:
-          name: jaramsae-v04-demo
-          path: output/demo-v04/
+          name: jaramsae-v06-demo
+          path: output/demo-v06/
           if-no-files-found: error
           retention-days: 7
-
-# Trigger demo render after workflow installation
