@@ -67,8 +67,12 @@ def render(out,browser_path):
     covers=[s for s in files if s.endswith('slide-01')]
     expected=len(json.loads((out/'editable/feed.json').read_text(encoding='utf-8'))['posts'])
     if len(covers)!=expected: errors.append({'issue':f'expected {expected} covers'})
-    def img(s): return f'<a href="png/{s}.png"><img src="png/{s}.png" alt="{s}" loading="lazy"></a>'
-    (out/'preview.html').write_text('<!doctype html><html lang="ko"><meta charset="utf-8"><title>피드 미리보기</title><style>body{font-family:sans-serif;background:#f5f5f5;max-width:960px;margin:24px auto;padding:16px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}img{width:100%;display:block}.covers img{aspect-ratio:3/4;object-fit:cover}a{display:block}</style><h1>인스타그램 피드 미리보기</h1><p>최신순 · 실제 게시 순서는 역순 · 이미지를 누르면 원본 열기</p><div class="grid covers">'+''.join(map(img,covers))+'</div><h2>전체 슬라이드</h2><div class="grid">'+''.join(map(img,files))+'</div></html>',encoding='utf-8')
+    def img(s):
+        image_path=png/(s+'.png')
+        uri='data:image/png;base64,'+base64.b64encode(image_path.read_bytes()).decode('ascii')
+        return f'<a href="{uri}" target="_blank" rel="noopener"><img src="{uri}" alt="{s}" loading="lazy"></a>'
+    preview='''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>인스타그램 피드 미리보기</title><style>*{box-sizing:border-box}body{font-family:Arial,"Malgun Gothic",sans-serif;background:#f5f4f1;color:#292722;max-width:1100px;margin:32px auto;padding:20px}h1{font-size:clamp(26px,4vw,40px)}.note{color:#6b675f}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.grid img{width:100%;height:auto;display:block;box-shadow:0 3px 14px #00000012}@media(max-width:700px){body{margin:12px auto;padding:14px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}</style></head><body><h1>인스타그램 피드 미리보기</h1><p class="note">이미지가 HTML 안에 포함되어 있어 이 파일 하나만 전달해도 미리 볼 수 있습니다. 이미지를 누르면 큰 크기로 열립니다.</p><div class="grid covers">'''+''.join(map(img,covers))+'''</div><h2>전체 슬라이드</h2><div class="grid">'''+''.join(map(img,files))+'''</div></body></html>'''
+    (out/'preview.html').write_text(preview,encoding='utf-8')
     report={'automatic_checks_passed':not errors,'slide_count':len(files),'cover_count':len(covers),'errors':errors,'manual_review_required':['기관 사실 및 연락처','사진 공개 동의 및 외부 전송 권한','한국어 맞춤법','색 대비 및 디자인 완성도','게시 승인']}
     (out/'review-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False)); return not errors
