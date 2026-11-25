@@ -19,7 +19,7 @@ def main():
     required = [
         out / "editable/index.html", out / "editable/style.css",
         out / "editable/feed.json", out / "preview.html",
-        out / "captions.md", out / "review-report.json"
+        out / "captions.md", out / "sources.md", out / "review-report.json"
     ]
     for path in required:
         if not path.is_file() or path.stat().st_size == 0:
@@ -47,6 +47,13 @@ def main():
             issues.append("renderer reported layout or image errors")
         if not pngs:
             issues.append("no individual slide PNGs were generated")
+        preview = (out / "preview.html").read_text(encoding="utf-8")
+        if preview.count("<img ") != expected + len(feed["posts"]):
+            issues.append("preview image count does not match covers + all slides")
+        if 'src="png/' in preview or 'href="png/' in preview:
+            issues.append("preview still contains fragile relative PNG paths")
+        if preview.count("data:image/png;base64,") < expected + len(feed["posts"]):
+            issues.append("preview does not embed all PNG images")
     except Exception as exc:
         issues.append(f"could not inspect render output: {exc}")
     result = {
