@@ -25,3 +25,5 @@ jobs:
           path: output/demo-v04/
           if-no-files-found: error
           retention-days: 7
+
+# Trigger demo render after workflow installation
