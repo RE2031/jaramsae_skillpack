@@ -10,6 +10,14 @@ def build(src,out):
     validate(data,json.loads((ROOT/'schemas/feed.schema.json').read_text(encoding='utf-8')))
     if out.exists(): raise ValueError('출력 폴더가 이미 존재합니다. 새 경로를 사용하세요.')
     # Check all image permissions and paths before creating outputs.
+    # Bold photo editorial requires a traceable, approved image on every slide.
+    if data.get('style') == 'bold-photo-editorial':
+        for post in data['posts']:
+            for slide in post['slides']:
+                if not slide.get('image'):
+                    raise ValueError('bold-photo-editorial은 모든 슬라이드에 승인된 사진이 필요합니다.')
+                if not slide.get('image_kind') or not slide.get('image_credit'):
+                    raise ValueError('bold-photo-editorial 사진은 image_kind와 image_credit를 기록해야 합니다.')
     for post in data['posts']:
         for s in post['slides']:
             if s.get('image'):
