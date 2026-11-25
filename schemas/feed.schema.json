@@ -118,7 +118,11 @@
                     "split-editorial",
                     "quiet-cover",
                     "photo-caption",
-                    "minimal-announcement"
+                    "minimal-announcement",
+                    "fullbleed-photo",
+                    "split-photo",
+                    "detail-photo",
+                    "text-interlude"
                   ]
                 },
                 "image": {
