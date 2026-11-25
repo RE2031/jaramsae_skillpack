@@ -10,3 +10,7 @@ style-direction → visual-curation → editorial-copywriting → post-compositi
 
 ## v0.4 시각 품질 규칙
 캐러셀 내 레이아웃과 사진 구도 다양성을 확보한다. 사진/타이포그래피 중심 편집 디자인을 우선하며 의미 없는 장식을 넣지 않는다. 자연스러운 한국어 문구 톤을 유지한다. preview.html은 이미지 내장형이어야 하며 quality_check에서 이미지 수와 데이터 URI를 검사한다. 자동 검수와 미감 평가는 구분한다.
+
+
+## v0.5 Editorial Hybrid 기본 방향
+별도 요청이 없으면 `editorial-hybrid`를 기본 스타일로 사용한다. 사진과 텍스트를 균형 있게 배치하고(50:50은 시각적 가이드), 사진은 활동 맥락을, 텍스트는 학부모가 이해할 활동 내용과 의미를 전달한다. 기본 4장 흐름은 표지 → 활동 디테일 → 활동의 의미 → 마무리다. `references/styles/editorial-hybrid.json` 및 `references/design-rules.md`를 따른다. 카피라이팅의 자연스러운 톤은 유지하고 디자인·사진·정보 전달을 별도로 검수한다.
