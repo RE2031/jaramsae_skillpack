@@ -57,3 +57,16 @@
 .text-interlude footer{position:absolute;bottom:68px;left:84px;right:84px;border-top:1px solid var(--accent);padding-top:20px;font-size:22px}
 .slide .category{letter-spacing:0}
 .slide h1{word-break:keep-all;overflow-wrap:normal}
+
+/* v0.5 editorial-hybrid: balanced photography and parent-friendly information */
+.preset-editorial-hybrid .category{font-size:26px;letter-spacing:0;color:var(--accent)}
+.preset-editorial-hybrid h1{font-family:"Noto Serif CJK KR","Batang",serif;font-weight:600;line-height:1.24;letter-spacing:-2px}
+.preset-editorial-hybrid p{font-size:36px;line-height:1.55;word-break:keep-all}
+.preset-editorial-hybrid .details{font-size:29px;line-height:1.5}
+.preset-editorial-hybrid .art{border-radius:8px}
+.preset-editorial-hybrid.split-photo .art,.preset-editorial-hybrid.split-editorial .art{height:500px}
+.preset-editorial-hybrid.detail-photo .art{border-radius:0}
+.preset-editorial-hybrid.text-interlude .art{display:none}
+.preset-editorial-hybrid.fullbleed-photo .art{border-radius:0}
+.preset-editorial-hybrid header{font-size:25px}
+.preset-editorial-hybrid footer{font-size:22px}
