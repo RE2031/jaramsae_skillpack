@@ -91,3 +91,7 @@ python scripts/pipeline.py examples/editorial-single.json --out output/editorial
   "image_focus_y": 54
 }
 ```
+
+
+## 편집형 HTML 및 시안 선택
+기본 4장 캐러셀은 시안 4개를 생성하고 `skills/editor-delivery/SKILL.md`에 따라 독립형 편집기 HTML을 만든다. 예: `python scripts/build_editor.py output/A output/B output/C output/D --out output/editor.html`. 선택한 시안을 저장하고 `python scripts/export_editor_selection.py selected.html --out output/selected-png`으로 PNG 4장을 다시 만든다. 기존 표지와 렌더링 파이프라인은 유지한다. 편집 데이터는 로컬 HTML에 저장되며 클라우드 저장이나 브라우저 직접 PNG 다운로드는 아직 지원하지 않는다.
