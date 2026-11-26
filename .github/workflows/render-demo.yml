@@ -28,6 +28,8 @@ jobs:
       - name: Check style preset consistency
         run: python scripts/test_style_presets.py
       - run: python -m playwright install --with-deps chromium
+      - name: Install Korean rendering fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
       - name: Render signature cover smoke test
         run: python scripts/test_signature_cover.py
       - name: Render four magazine editions
