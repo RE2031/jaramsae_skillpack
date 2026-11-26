@@ -1,4 +1,4 @@
-# Instagram Feed Skill Pack v0.6
+# Instagram Feed Skill Pack v0.7
 한국어 보육기관 인스타그램 피드 제작용 Agent Skills + 렌더러. 원장의 자연어 요청을 받은 AI 에이전트가 콘텐츠 JSON을 작성하고, 로컬 렌더러가 편집 가능한 HTML/CSS와 PNG를 생성한다. 자체 서비스 홍보 및 자동 게시 기능은 범위 밖이다.
 
 ## 빠른 시작
@@ -24,7 +24,7 @@ Windows에서도 동일하게 실행한다. 시스템 Chromium을 사용하려�
 - `modern-magazine`: 강한 헤드라인과 편집형 구성
 - `minimal-information`: 정보 전달 및 체크리스트
 
-기본 `bold-photo-editorial`은 사진이 캔버스를 가득 채우고, 하단의 어두운 그라데이션 위에 작은 도입 문구와 큰 흰색 제목, 짧은 보조 설명을 배치한다. 사진 약 75% / 텍스트 약 25%를 시각적 출발점으로 삼는다. 모든 슬라이드에 승인된 사진이 필요하며, 이미지 안에 텍스트를 생성하지 않고 HTML/CSS로 편집 가능한 텍스트를 렌더링한다. 정보가 더 필요한 콘텐츠는 `editorial-hybrid`를 선택한다. 기관 고유 브랜드 가이드가 있으면 이를 우선한다.
+기본 `bold-photo-editorial`은 사진이 캔버스를 가득 채우고, 하단의 어두운 그라데이션 위에 작은 도입 문구 한 줄과 큰 흰색 제목 두 줄을 배치한다. 첫 장에는 보조 설명을 넣지 않는다. 사진 약 75% / 텍스트 약 25%를 시각적 출발점으로 삼는다. 모든 슬라이드에 승인된 사진이 필요하며, 이미지 안에 텍스트를 생성하지 않고 HTML/CSS로 편집 가능한 텍스트를 렌더링한다. 정보가 더 필요한 콘텐츠는 `editorial-hybrid`를 선택한다. 기관 고유 브랜드 가이드가 있으면 이를 우선한다.
 
 브랜드의 일반적인 시각 문법을 참고했으며 제3자 로고·사진·고유 템플릿을 포함하지 않는다. 사진은 기관이 공개 홍보 권한을 확인한 로컬 파일만 사용한다. `bold-photo-editorial`은 승인된 사진이 없으면 실행하지 않는다. 사진이 없다면 기관에 사진을 요청하거나 `editorial-hybrid`/`minimal-information`으로 스타일을 변경한다.
 
@@ -56,3 +56,33 @@ python scripts/pipeline.py path/to/feed.json --out output/unique-job-name
 python scripts/pipeline.py examples/editorial-single.json --out output/editorial
 ```
 위 예시는 사진 없는 데모. 사진형은 승인 사진 파일을 JSON 옆에 놓고 image, image_approved, image_kind, image_credit, image_position을 지정하고 hero-left-copy를 사용한다. 생성/스톡 이미지는 실제 기관이 아님을 표시한다. 렌더러 자체는 이미지 생성 API를 호출하지 않는다. 이미지 생성 가능 에이전트가 별도로 소재를 준비한다. Noto Serif CJK KR 또는 바탕 서체 권장.
+
+## v0.7 Signature Cover — 사용자 승인 표지
+기본 bold-photo-editorial의 각 게시물 첫 장(단일 게시물 포함)에 필수 적용한다. 기존 다른 스타일과 2장 이후의 정보형 레이아웃은 유지한다.
+- 1080×1350, 4:5. 사진을 화면 끝까지 채운다. 흐린 좌우 확장 배경, contain, 사진 축소 금지.
+- 상단 중앙에는 원장님이 입력한 institution을 그대로 표시한다. 임의 기관명·타사 로고 금지.
+- 아이의 얼굴·손·활동 소재(블록 등)가 크게 보이도록 원본을 확대하고 초점을 조정한다. 배경 가구보다 활동이 중심이다. 필요한 경우 원본 사진을 다시 고르거나 크롭한다. 얼굴이나 손·소재를 가리지 않도록 검수한다.
+- 하단에는 활동을 나타내는 작은 얇은 도입 문구 1줄(eyebrow, 예: 오늘의 놀이 기록, 오늘의 교육 활동)과 굵은 흰색 제목 정확히 2줄만 배치한다. title에 명시적 줄바꿈 하나를 넣는다. 넘치면 문구를 다시 쓰고 글씨를 작게 줄이지 않는다.
+- 표지 body는 빈 문자열, details는 비워 둔다. 설명은 다음 장 또는 caption에 넣는다. 제목 아래 설명·슬라이드 번호·분류 반복 금지.
+- 우측 하단은 출처 | Pexels처럼 실제 출처만 작게 표시한다. stock의 image_source에는 실제 플랫폼명을, image_credit에는 상세 출처/저작자 정보를 기록한다. 생성 사진은 출처 | AI 생성으로 명시한다. 기관 제공 사진은 실제 출처에 맞게 표시한다.
+- 스톡 사진을 실제 원아나 활동 기록처럼 오인시키지 않도록 caption에 대체 사진임을 명시하고 사용 권한을 검증한다. Pinterest는 원본 권리 확인 없이 사용하지 않는다. 생성/스톡 표시 및 게시 승인 상태는 표지의 추가 본문이 아니라 캡션·검수 보고서에 기록한다.
+- 하단 그라데이션을 제한해 얼굴과 활동을 밝고 선명하게 유지한다. PNG를 실제로 열어 아이와 소재가 충분히 큰지 확인한다.
+- image_zoom(1~3), image_focus_x/y(0~100)를 필요에 맞게 조정할 수 있다. 기본 확대 1.15, 중심 초점 50/50은 출발값이며 사진마다 수정한다.
+
+### 표지 입력 예시 (슬라이드 일부)
+```json
+{
+  "title": "블록 하나로 만드는\n나만의 작은 세상",
+  "eyebrow": "오늘의 놀이 기록",
+  "body": "",
+  "layout": "fullbleed-photo",
+  "image": "assets/approved-photo.jpg",
+  "image_approved": true,
+  "image_kind": "stock",
+  "image_source": "Pexels",
+  "image_credit": "Pexels · 원본 작가 및 URL 기록",
+  "image_zoom": 1.15,
+  "image_focus_x": 50,
+  "image_focus_y": 54
+}
+```

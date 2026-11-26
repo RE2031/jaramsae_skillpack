@@ -160,6 +160,31 @@
                     "stock",
                     "generated"
                   ]
+                },
+                "eyebrow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "image_source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "image_zoom": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "image_focus_x": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "image_focus_y": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },

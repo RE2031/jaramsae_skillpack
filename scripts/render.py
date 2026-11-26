@@ -18,6 +18,23 @@ def build(src,out):
                     raise ValueError('bold-photo-editorial은 모든 슬라이드에 승인된 사진이 필요합니다.')
                 if not slide.get('image_kind') or not slide.get('image_credit'):
                     raise ValueError('bold-photo-editorial 사진은 image_kind와 image_credit를 기록해야 합니다.')
+    if data['style'] == 'bold-photo-editorial':
+        for post in data['posts']:
+            cover = post['slides'][0]
+            lines = cover['title'].split('\n')
+            if len(lines) != 2 or any(not line.strip() for line in lines):
+                raise ValueError('Signature Cover: title에는 비어 있지 않은 두 줄을 명시해야 합니다.')
+            eyebrow = cover.get('eyebrow', post['category'])
+            if not eyebrow.strip() or '\n' in eyebrow or '\r' in eyebrow:
+                raise ValueError('Signature Cover: eyebrow는 활동을 나타내는 한 줄이어야 합니다.')
+            if cover['body'].strip() or cover.get('details'):
+                raise ValueError('Signature Cover: body/details는 비우고 설명은 다음 장 또는 caption에 작성하세요.')
+            if cover.get('image_kind') == 'stock' and not cover.get('image_source','').strip():
+                raise ValueError('Signature Cover: stock 사진은 image_source에 실제 제공처를 기록하세요.')
+            if cover.get('image_kind') in {'stock','generated'}:
+                notice = '사진은 실제 기관 활동을 촬영한 것이 아닌 예시 이미지입니다.'
+                if notice not in post['caption']:
+                    post['caption'] += '\n\n' + notice
     for post in data['posts']:
         for s in post['slides']:
             if s.get('image'):
@@ -43,6 +60,17 @@ def build(src,out):
             details=''.join(f'<div>{e(v)}</div>' for v in s.get('details',[]))
             credit=e(s.get('image_credit',''))
             has_image=' has-image' if s.get('image') else ' no-image'
+            if data['style'] == 'bold-photo-editorial' and j == 1:
+                lines = ''.join(f'<span>{e(line.strip())}</span>' for line in s['title'].split('\n'))
+                eyebrow = e(s.get('eyebrow',post['category']).strip())
+                platform = 'AI 생성' if s.get('image_kind') == 'generated' else (s.get('image_source') or s.get('image_credit') or '기관 제공')
+                platform = platform.removeprefix('출처 | ').strip()
+                zoom = s.get('image_zoom',1.15)
+                x = s.get('image_focus_x',50)
+                y = s.get('image_focus_y',50)
+                photo = f'<img src="{e(s["image"],quote=True)}" alt="활동 사진" style="object-position:{x}% {y}%;transform:scale({zoom});transform-origin:{x}% {y}%">'
+                blocks.append(f'<article class="slide preset-bold-photo-editorial signature-cover has-image" id="{sid}" style="{colors}"><div class="art">{photo}</div><div class="cover-brand">{e(data["institution"])}</div><div class="cover-copy"><div class="cover-eyebrow">{eyebrow}</div><h1>{lines}</h1></div><div class="cover-credit">출처 | {e(platform)}</div></article>')
+                continue
             blocks.append(f'<article class="slide {s["layout"]} preset-{data["style"]}{has_image}" id="{sid}" style="{colors}"><header><span>{e(data["institution"])}</span>{draft}</header><div class="category">{e(post["category"])}</div><h1>{e(s["title"])}</h1><div class="art">{art}</div><p>{e(s["body"])}</p><div class="details">{details}</div><footer><span> {i:02d} · {e(post["category"])}</span><span>{credit or (str(j).zfill(2)+" / "+str(len(post["slides"])).zfill(2))}</span></footer></article>')
     (edit/'index.html').write_text('<!doctype html><html lang="ko"><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head><body>'+''.join(blocks)+'</body></html>',encoding='utf-8')
     (edit/'feed.json').write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
@@ -68,7 +96,7 @@ def render(out,browser_path):
         page.set_content(source); page.evaluate('document.fonts.ready')
         for slide in page.locator('.slide').all():
             sid=slide.get_attribute('id'); files.append(sid)
-            issues=slide.evaluate('''el=>{const r=el.getBoundingClientRect();let a=[];if(r.width!==1080||r.height!==1350)a.push('wrong size');for(const c of el.querySelectorAll('header,h1,p,footer,.category,.art,.details')){if(getComputedStyle(c).display==='none')continue;let b=c.getBoundingClientRect();if(b.bottom>r.bottom||b.right>r.right||b.left<r.left||b.top<r.top||c.scrollWidth>c.clientWidth+2)a.push('overflow '+c.tagName)}for(const im of el.querySelectorAll('img'))if(!im.complete||!im.naturalWidth)a.push('image failed');return a}''')
+            issues=slide.evaluate('''el=>{const r=el.getBoundingClientRect();let a=[];if(r.width!==1080||r.height!==1350)a.push('wrong size');for(const c of el.querySelectorAll('header,h1,p,footer,.category,.art,.details')){if(getComputedStyle(c).display==='none')continue;let b=c.getBoundingClientRect();if(b.bottom>r.bottom||b.right>r.right||b.left<r.left||b.top<r.top||c.scrollWidth>c.clientWidth+2)a.push('overflow '+c.tagName)}if(el.classList.contains('signature-cover')){let spans=el.querySelectorAll('h1>span');if(spans.length!==2)a.push('cover headline must have two lines');for(const s of spans)if(s.scrollWidth>s.clientWidth+2)a.push('cover headline line overflow');for(const c of el.querySelectorAll('.cover-brand,.cover-eyebrow,.cover-credit'))if(c.scrollWidth>c.clientWidth+2)a.push('cover label overflow');if(el.querySelector('p,.details'))a.push('cover contains body copy')}for(const im of el.querySelectorAll('img'))if(!im.complete||!im.naturalWidth)a.push('image failed');return a}''')
             if issues: errors.append({'slide':sid,'issues':issues})
             slide.screenshot(path=str(png/(sid+'.png')),animations='disabled')
         browser.close()

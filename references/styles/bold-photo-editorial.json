@@ -1,6 +1,6 @@
 {
   "name": "bold-photo-editorial",
-  "version": "1.0",
+  "version": "1.1",
   "purpose": "강렬한 풀블리드 사진과 하단의 대담한 한국어 헤드라인으로 기관의 활동과 메시지를 한눈에 전달하는 고밀도 인스타그램 에디토리얼 스타일",
   "reference_principles": "사용자가 제공한 인스타그램 피드 캡처에서 관찰한 일반적인 디자인 원리만 반영한다. 제3자 로고, 고유 카피, 사진, 템플릿을 복제하지 않는다.",
   "mood": [
@@ -20,10 +20,10 @@
     "canvas": "1080x1350 portrait 4:5",
     "image": "single full-bleed photograph fills the entire canvas; no card frame or outer margin",
     "overlay": "subtle top readability treatment and strong dark gradient over the lower 40-50 percent",
-    "brand": "small institution name or approved logo centered near the top",
+    "brand": "first slide: exact institution name centered near the top",
     "eyebrow": "small, light-weight introductory phrase above the headline",
-    "headline": "large, heavy, high-contrast white Korean headline, usually 2-3 lines in the lower third",
-    "supporting_copy": "one concise supporting sentence below the headline",
+    "headline": "first slide exactly two explicit bold white lines; later slides may vary",
+    "supporting_copy": "none on first slide; concise body permitted on later slides",
     "credit": "tiny source/slide credit near the bottom edge"
   },
   "typography": {
@@ -72,5 +72,20 @@
       1080,
       1350
     ]
+  },
+  "signature_cover": {
+    "scope": "first slide of every bold-photo-editorial post",
+    "canvas": [
+      1080,
+      1350
+    ],
+    "brand": "exact institution name from director",
+    "eyebrow": "one activity label, e.g. 오늘의 놀이 기록",
+    "headline": "exactly two explicitly separated bold white lines",
+    "supporting_copy": "none; move to subsequent slides or caption",
+    "credit": "출처 | actual source; detailed attribution in sources.md",
+    "crop": "full-bleed subject-first zoom-in; face, hands, activity material legible",
+    "image_zoom_default": 1.15,
+    "gradient": "approved reference stops: 0/16/49/59/73/100 percent"
   }
 }
