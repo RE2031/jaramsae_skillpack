@@ -4,7 +4,8 @@ description: 기관 전용 한국어 인스타그램을 강렬한 사진 중심 
 ---
 # instagram-feed-creator
 
-1. brand-identity와 style-direction으로 기관 목적, 독자, 브랜드 및 확인된 사실을 정리한다.
+0. institution-onboarding을 적용한다. 기존 기관 프로필을 재사용하고 최초 설정이면 prompts/onboarding.md의 여섯 질문 중 미응답만 묻는다. 즉시 제작 요청이면 필요한 정보만 확인한다. 설정만 요청했으면 프로필 정리 후 종료한다.
+1. brand-identity와 style-direction으로 기관 프로필 및 현재 활동 요청에서 목적, 독자, 브랜드 및 확인된 사실을 정리한다.
 2. reference-analysis와 `references/styles/bold-photo-editorial.json`, `references/design-rules.md`를 읽는다. 기관 고유 브랜드 요청이 없다면 기본 스타일은 `bold-photo-editorial`이다. 정보가 많은 안내/체크리스트를 요청하면 `editorial-hybrid` 또는 `minimal-information`을 선택할 수 있다.
 3. visual-curation으로 각 슬라이드에 사용할 서로 다른 사진을 준비한다. 기본 스타일에서는 모든 슬라이드에 승인된 이미지가 필요하다. 실제 기관 사진은 공개 및 외부 AI 전송 권한을 확인한다. 생성 사진은 글자·로고·워터마크 없이 만들고, 모든 문구와 기관명은 HTML/CSS 텍스트로 렌더링한다. 생성 사진을 실제 기관이나 원아 사진으로 오인시키지 않는다.
 4. feed-planning, editorial-copywriting, post-composition을 적용한다. 단일 요청에는 1개, 전체 피드에는 기본 9개. 사용자가 지정한 개수와 슬라이드 수를 우선한다.

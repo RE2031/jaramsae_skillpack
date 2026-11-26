@@ -1,6 +1,9 @@
 # 작업 지침
 기관 전용 한국어 인스타그램 제작 요청에는 `skills/instagram-feed-creator/SKILL.md`를 먼저 읽는다. 하위 스킬과 `references/design-rules.md`, `schemas/feed.schema.json`을 따른다. 실제 기관 정보와 공개 허가 사진만 사용하고 불명확한 사실은 초안으로 표시한다. 사용자 승인 전 자동 게시 금지. 결과물 생성 후 렌더링 결과를 확인하고 검수 결과를 보고한다.
 
+## 기관 최초 설정 및 재사용
+기관별 프로필이 없는 경우 `skills/institution-onboarding/SKILL.md` 및 `prompts/onboarding.md`를 읽는다. 최초 설정은 여섯 가지 질문으로 진행하며 이미 제공된 정보는 다시 묻지 않는다. 기관 프로필은 `schemas/brand-profile.schema.json`을 따르고, 가상 예시는 `examples/brand-profile.json`을 참고한다. 실제 기관 프로필은 비공개 기관별 저장소에만 보관하고 Git에 올리지 않는다. 저장 환경이 없으면 미저장이라고 보고한다. 즉시 제작 요청의 경우 필요한 정보만 확인하고 선택 항목을 이유로 작업을 막지 않는다. 기존 v0.7 Signature Cover와 렌더링 절차를 유지한다.
+
 ## 기본 스타일 v0.6
 별도 요청이 없으면 `bold-photo-editorial`을 기본값으로 사용한다. 풀블리드 사진, 상단 중앙의 작은 기관명, 하단의 어두운 그라데이션, 작은 도입 문구, 크고 굵은 흰색 제목, 작은 출처 표기를 사용한다. 첫 장에는 보조 문구를 넣지 않는다. 사진은 약 75%, 텍스트는 약 25%의 시각적 비중을 출발점으로 한다. 모든 슬라이드에 승인된 사진이 필요하며 사진 안에 생성된 글자나 로고를 사용하지 않고 HTML/CSS 텍스트 레이어를 사용한다. 상세 기준은 `references/styles/bold-photo-editorial.json`을 따른다. 정보 중심 요청에는 `editorial-hybrid` 또는 `minimal-information`을 사용할 수 있다.
 
