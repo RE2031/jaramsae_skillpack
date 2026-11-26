@@ -1,4 +1,4 @@
-# Instagram Feed Skill Pack v0.7
+# Instagram Feed Skill Pack v0.8
 한국어 보육기관 인스타그램 피드 제작용 Agent Skills + 렌더러. 원장의 자연어 요청을 받은 AI 에이전트가 콘텐츠 JSON을 작성하고, 로컬 렌더러가 편집 가능한 HTML/CSS와 PNG를 생성한다. 자체 서비스 홍보 및 자동 게시 기능은 범위 밖이다.
 
 ## 빠른 시작
@@ -95,3 +95,9 @@ python scripts/pipeline.py examples/editorial-single.json --out output/editorial
 
 ## 편집형 HTML 및 시안 선택
 기본 4장 캐러셀은 시안 4개를 생성하고 `skills/editor-delivery/SKILL.md`에 따라 독립형 편집기 HTML을 만든다. 예: `python scripts/build_editor.py output/A output/B output/C output/D --out output/editor.html`. 선택한 시안을 저장하고 `python scripts/export_editor_selection.py selected.html --out output/selected-png`으로 PNG 4장을 다시 만든다. 기존 표지와 렌더링 파이프라인은 유지한다. 편집 데이터는 로컬 HTML에 저장되며 클라우드 저장이나 브라우저 직접 PNG 다운로드는 아직 지원하지 않는다.
+
+## TIO 우선 매거진 시안 — 최신 우선 지침
+`references/magazine-editions.md`를 먼저 읽는다. TIO(@tio_korea)는 표지 최우선 레퍼런스이며 기존 승인 Signature Cover는 A에 그대로 보존한다. MMM, Eyesmag, 생매거진, Our Expresso는 시안별 보조 레퍼런스다. B/C/D도 풀블리드, 상단 중앙 기관명, 하단 얇은 도입 문구, 정확히 두 줄 굵은 흰색 제목, 우측 하단 출처, 표지 본문 없음이라는 TIO 기반 구조를 유지하면서 타이포/명암/여백을 변주한다. 네 시안에서 사진·활동 사실·카피·브랜드는 동일하게 유지하고 실제 CSS 배치·서체·사진 영역을 다르게 한다. 본문은 아직 사용자 최종 승인 전인 후보 디자인이며 기존 A를 유지한다. 네 시안은 각 4장 한 줄, 총 16장 편집기로 제공한다. 단일 표지 요청에는 A를 기본으로 한다. 원본 권리 확인 및 실제 파이프라인 검수는 기존 규칙을 유지한다.
+
+### 네 가지 실제 디자인 일괄 출력
+`python scripts/make_editions.py INPUT.json --out output/four-editions` — 동일한 4장 콘텐츠를 A/B/C/D로 렌더링하고 editor.html을 생성한다. 본문 B~D는 후보 디자인이다.

@@ -47,6 +47,8 @@ def build(src,out):
     edit=out/'editable'; assets=edit/'assets'; assets.mkdir(parents=True)
     shutil.copy(ROOT/'templates/style.css',edit/'style.css')
     blocks=[]; covers=[]; captions=[]
+    variant=data.get('editorial_variant','signature')
+    edition_class='' if variant=='signature' else ' edition-'+variant
     for i,post in enumerate(data['posts'],1):
         captions.append(f"## {i:02d}. {post['category']}\n\n{post['caption']}\n\n{' '.join(post['hashtags'])}\n")
         for j,s in enumerate(post['slides'],1):
@@ -69,7 +71,13 @@ def build(src,out):
                 x = s.get('image_focus_x',50)
                 y = s.get('image_focus_y',50)
                 photo = f'<img src="{e(s["image"],quote=True)}" alt="활동 사진" style="object-position:{x}% {y}%;transform:scale({zoom});transform-origin:{x}% {y}%">'
-                blocks.append(f'<article class="slide preset-bold-photo-editorial signature-cover has-image" id="{sid}" style="{colors}"><div class="art">{photo}</div><div class="cover-brand">{e(data["institution"])}</div><div class="cover-copy"><div class="cover-eyebrow">{eyebrow}</div><h1>{lines}</h1></div><div class="cover-credit">출처 | {e(platform)}</div></article>')
+                blocks.append(f'<article class="slide preset-bold-photo-editorial signature-cover has-image{edition_class}" id="{sid}" style="{colors}"><div class="art">{photo}</div><div class="cover-brand">{e(data["institution"])}</div><div class="cover-copy"><div class="cover-eyebrow">{eyebrow}</div><h1>{lines}</h1></div><div class="cover-credit">출처 | {e(platform)}</div></article>')
+                continue
+            if data['style']=='bold-photo-editorial' and variant!='signature':
+                label=e(s.get('eyebrow',post['category']))
+                platform='AI 생성' if s.get('image_kind')=='generated' else (s.get('image_source') or s.get('image_credit') or '기관 제공')
+                platform=e(platform.removeprefix('출처 | ').strip())
+                blocks.append(f'<article class="slide magazine-interior edition-{variant} page-{j} has-image" id="{sid}" style="{colors}"><header><span>{e(data["institution"])}</span>{draft}</header><div class="category">{label}</div><h1>{e(s["title"])}</h1><div class="art">{art}</div><p>{e(s["body"])}</p><div class="details">{details}</div><footer><span>{j:02d} / {len(post["slides"]):02d}</span><span>출처 | {platform}</span></footer></article>')
                 continue
             blocks.append(f'<article class="slide {s["layout"]} preset-{data["style"]}{has_image}" id="{sid}" style="{colors}"><header><span>{e(data["institution"])}</span>{draft}</header><div class="category">{e(post["category"])}</div><h1>{e(s["title"])}</h1><div class="art">{art}</div><p>{e(s["body"])}</p><div class="details">{details}</div><footer><span> {i:02d} · {e(post["category"])}</span><span>{credit or (str(j).zfill(2)+" / "+str(len(post["slides"])).zfill(2))}</span></footer></article>')
     (edit/'index.html').write_text('<!doctype html><html lang="ko"><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head><body>'+''.join(blocks)+'</body></html>',encoding='utf-8')

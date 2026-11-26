@@ -31,3 +31,6 @@ style-direction → visual-curation → editorial-copywriting → post-compositi
 
 ## 편집형 HTML 및 시안 선택
 기본 게시물은 4장짜리 시안 4개를 각각 렌더링하고 `skills/editor-delivery/SKILL.md`를 읽어 편집 가능한 독립형 editor.html을 생성·검수한다. 원장님에게는 3×3 피드 대신 각 시안 4장씩 한 줄로 표시하는 편집기를 우선 전달한다. 명시적으로 표지 1장 또는 다른 수량을 요청하면 우선한다. Signature Cover와 기존 본문 디자인, 권한 및 검수 절차는 유지한다. 선택안 PNG는 편집 후 별도로 재렌더링한다.
+
+## TIO 우선 매거진 시안 — 최신 우선 지침
+`references/magazine-editions.md`를 먼저 읽는다. TIO(@tio_korea)는 표지 최우선 레퍼런스이며 기존 승인 Signature Cover는 A에 그대로 보존한다. MMM, Eyesmag, 생매거진, Our Expresso는 시안별 보조 레퍼런스다. B/C/D도 풀블리드, 상단 중앙 기관명, 하단 얇은 도입 문구, 정확히 두 줄 굵은 흰색 제목, 우측 하단 출처, 표지 본문 없음이라는 TIO 기반 구조를 유지하면서 타이포/명암/여백을 변주한다. 네 시안에서 사진·활동 사실·카피·브랜드는 동일하게 유지하고 실제 CSS 배치·서체·사진 영역을 다르게 한다. 본문은 아직 사용자 최종 승인 전인 후보 디자인이며 기존 A를 유지한다. 네 시안은 각 4장 한 줄, 총 16장 편집기로 제공한다. 단일 표지 요청에는 A를 기본으로 한다. 원본 권리 확인 및 실제 파이프라인 검수는 기존 규칙을 유지한다.

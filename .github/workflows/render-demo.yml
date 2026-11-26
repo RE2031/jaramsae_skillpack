@@ -30,6 +30,8 @@ jobs:
       - run: python -m playwright install --with-deps chromium
       - name: Render signature cover smoke test
         run: python scripts/test_signature_cover.py
+      - name: Render four magazine editions
+        run: python scripts/test_magazine_editions.py
       - name: Render and verify demo
         run: python scripts/pipeline.py examples/demo.json --out output/demo-v06
       - uses: actions/upload-artifact@v4

@@ -193,6 +193,31 @@
           }
         }
       }
+    },
+    "editorial_variant": {
+      "enum": [
+        "signature",
+        "modern",
+        "story",
+        "creative"
+      ],
+      "description": "Optional TIO-first visual edition for bold-photo-editorial; default signature preserves legacy styling."
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "editorial_variant"
+        ]
+      },
+      "then": {
+        "properties": {
+          "style": {
+            "const": "bold-photo-editorial"
+          }
+        }
+      }
+    }
+  ]
 }

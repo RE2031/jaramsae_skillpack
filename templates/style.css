@@ -98,3 +98,43 @@
 .slide.signature-cover h1{position:relative;z-index:1;margin:0;max-width:none;width:100%;color:#fff;font-family:"Noto Sans CJK KR","Malgun Gothic",sans-serif;font-size:94px;line-height:1.17;font-weight:900;-webkit-text-stroke:.75px white;letter-spacing:-4.5px;text-shadow:none}
 .signature-cover h1 span{display:block;white-space:nowrap}
 .signature-cover .cover-credit{position:absolute;z-index:1;bottom:2.1%;left:5.5%;right:5.5%;text-align:right;font-size:22px;color:#ddd;white-space:nowrap}
+
+/* v0.8 TIO-first cover variants. Signature A is deliberately untouched. */
+.slide.signature-cover.edition-modern .cover-copy{left:6.7%;right:6.7%;bottom:9.6%}
+.slide.signature-cover.edition-modern h1{font-size:88px;line-height:1.13;letter-spacing:-5px;font-weight:900}
+.signature-cover.edition-modern .cover-eyebrow{font-size:38px;margin-bottom:22px;letter-spacing:-.5px}
+.signature-cover.edition-modern .art:after{background:linear-gradient(180deg,#0004 0%,transparent 19%,transparent 44%,#0004 65%,#000e 100%)}
+.slide.signature-cover.edition-story .cover-copy{bottom:8.9%;left:6.1%;right:6.1%}
+.slide.signature-cover.edition-story h1{font-size:86px;line-height:1.23;letter-spacing:-3px;font-weight:800}
+.signature-cover.edition-story .cover-eyebrow{font-size:42px;font-weight:350;margin-bottom:16px}
+.signature-cover.edition-story .art:after{background:linear-gradient(180deg,#24180e55 0%,transparent 20%,transparent 46%,#24180e44 65%,#24180ee8 100%)}
+.slide.signature-cover.edition-creative .cover-copy{bottom:10%;left:5.5%;right:5.5%}
+.slide.signature-cover.edition-creative h1{font-size:92px;letter-spacing:-5px;line-height:1.12;font-weight:900}
+.signature-cover.edition-creative .cover-eyebrow{font-size:35px;margin-bottom:18px;padding-left:18px;border-left:5px solid var(--accent)}
+/* Provisional interior treatments, distinct from the preserved original A. */
+.slide.magazine-interior{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:48px auto auto minmax(0,1fr) auto auto 40px;padding:62px 72px 48px;gap:20px;background:#fdfdfb;color:#20252a;align-content:stretch}
+.magazine-interior header{padding:0;border:0;border-bottom:2px solid currentColor;font-size:26px;align-items:start;line-height:1.2}
+.magazine-interior .draft{font-size:18px;font-weight:400}
+.magazine-interior .category{font-size:27px;font-weight:600;color:inherit;letter-spacing:0}
+.magazine-interior h1{font:800 64px/1.2 "Noto Sans CJK KR","Malgun Gothic",sans-serif;letter-spacing:-2.5px;white-space:pre-line}
+.magazine-interior .art{width:100%;height:100%;min-height:0;border-radius:0;background:#eee}
+.magazine-interior .art img{width:100%;height:100%;object-fit:cover}
+.magazine-interior p{font-size:35px;line-height:1.45;white-space:pre-line}
+.magazine-interior .details{font-size:27px;line-height:1.4}
+.magazine-interior .details:empty{display:block;height:0}
+.magazine-interior footer{margin:0;padding:0;font-size:20px;border-top:1px solid currentColor;align-items:end}
+.slide.magazine-interior.edition-story{background:#f5f0e7;color:#453a30;padding:64px 82px 52px;grid-template-rows:48px minmax(0,1fr) auto auto auto auto 40px;gap:17px}
+.magazine-interior.edition-story .art{grid-row:2}
+.magazine-interior.edition-story .category{grid-row:3;font-weight:400}
+.magazine-interior.edition-story h1{grid-row:4;font-family:"Noto Serif CJK KR","Batang",serif;font-weight:700;font-size:59px;letter-spacing:-1.5px}
+.magazine-interior.edition-story p{grid-row:5;font-size:34px}
+.magazine-interior.edition-story .details{grid-row:6}
+.magazine-interior.edition-story footer{grid-row:7}
+.slide.magazine-interior.edition-creative{background:var(--bg);color:var(--primary);grid-template-columns:1fr 1fr;grid-template-rows:48px auto auto minmax(0,1fr) auto auto 40px;gap:19px 25px;padding:55px 64px 48px}
+.magazine-interior.edition-creative header,.magazine-interior.edition-creative footer,.magazine-interior.edition-creative h1,.magazine-interior.edition-creative .details{grid-column:1/-1}
+.magazine-interior.edition-creative .category{grid-column:1/-1;border-left:7px solid var(--accent);padding-left:18px}
+.magazine-interior.edition-creative .art{grid-column:1/-1;grid-row:4;width:88%;justify-self:start}
+.magazine-interior.edition-creative.page-3 .art{justify-self:end}
+.magazine-interior.edition-creative h1{font-size:72px;line-height:1.15}
+.magazine-interior.edition-creative p{grid-column:1/-1;width:88%;font-size:33px;justify-self:end}
+.magazine-interior.edition-creative.page-3 p{justify-self:start}
