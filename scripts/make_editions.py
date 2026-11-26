@@ -9,7 +9,7 @@ NAMES=['A · Signature','B · Modern','C · Story','D · Creative']
 def make(source,out):
     source=Path(source).resolve();out=Path(out).resolve()
     data=json.loads(source.read_text(encoding='utf-8'))
-    if data['style']!='bold-photo-editorial' or len(data['posts'])!=1 or len(data['posts'][0]['slides'])!=4:
+    if data.get('body_only',False) or data['style']!='bold-photo-editorial' or len(data['posts'])!=1 or len(data['posts'][0]['slides'])!=4:
         raise ValueError('Expected one bold-photo-editorial post with four approved photo slides')
     out.mkdir(parents=True,exist_ok=False)
     with tempfile.TemporaryDirectory() as tmp:

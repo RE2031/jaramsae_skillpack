@@ -18,7 +18,7 @@ def build(src,out):
                     raise ValueError('bold-photo-editorial은 모든 슬라이드에 승인된 사진이 필요합니다.')
                 if not slide.get('image_kind') or not slide.get('image_credit'):
                     raise ValueError('bold-photo-editorial 사진은 image_kind와 image_credit를 기록해야 합니다.')
-    if data['style'] == 'bold-photo-editorial':
+    if data['style'] == 'bold-photo-editorial' and not data.get('body_only',False):
         for post in data['posts']:
             cover = post['slides'][0]
             lines = cover['title'].split('\n')
@@ -35,6 +35,16 @@ def build(src,out):
                 notice = '사진은 실제 기관 활동을 촬영한 것이 아닌 예시 이미지입니다.'
                 if notice not in post['caption']:
                     post['caption'] += '\n\n' + notice
+    if data['style']=='bold-photo-editorial':
+        for post in data['posts']:
+            if any(s.get('image_kind')=='stock' and not s.get('image_source','').strip() for s in post['slides']):
+                raise ValueError('Stock photos require image_source on every slide.')
+            if any(s.get('image_kind') in {'stock','generated'} for s in post['slides']):
+                notice='사진은 실제 기관 활동을 촬영한 것이 아닌 예시 이미지입니다.'
+                if notice not in post['caption']: post['caption'] += '\n\n'+notice
+            for s in post['slides'][0 if data.get('body_only',False) else 1:]:
+                if not s['body'].strip() or s.get('details'):
+                    raise ValueError('기사형 본문에는 body를 작성하고 details는 비워 주세요.')
     for post in data['posts']:
         for s in post['slides']:
             if s.get('image'):
@@ -62,7 +72,7 @@ def build(src,out):
             details=''.join(f'<div>{e(v)}</div>' for v in s.get('details',[]))
             credit=e(s.get('image_credit',''))
             has_image=' has-image' if s.get('image') else ' no-image'
-            if data['style'] == 'bold-photo-editorial' and j == 1:
+            if data['style'] == 'bold-photo-editorial' and j == 1 and not data.get('body_only',False):
                 lines = ''.join(f'<span>{e(line.strip())}</span>' for line in s['title'].split('\n'))
                 eyebrow = e(s.get('eyebrow',post['category']).strip())
                 platform = 'AI 생성' if s.get('image_kind') == 'generated' else (s.get('image_source') or s.get('image_credit') or '기관 제공')
@@ -73,11 +83,14 @@ def build(src,out):
                 photo = f'<img src="{e(s["image"],quote=True)}" alt="활동 사진" style="object-position:{x}% {y}%;transform:scale({zoom});transform-origin:{x}% {y}%">'
                 blocks.append(f'<article class="slide preset-bold-photo-editorial signature-cover has-image{edition_class}" id="{sid}" style="{colors}"><div class="art">{photo}</div><div class="cover-brand">{e(data["institution"])}</div><div class="cover-copy"><div class="cover-eyebrow">{eyebrow}</div><h1>{lines}</h1></div><div class="cover-credit">출처 | {e(platform)}</div></article>')
                 continue
-            if data['style']=='bold-photo-editorial' and variant!='signature':
-                label=e(s.get('eyebrow',post['category']))
+            if data['style']=='bold-photo-editorial':
+                page_num=j+int(data.get('body_only',False))
+                page_total=len(post['slides'])+int(data.get('body_only',False))
+                labels={2:'놀이의 시작',3:'아이들이 해본 일',4:'이어진 놀이'}
+                label=e(s.get('eyebrow',labels.get(page_num,post['category'])))
                 platform='AI 생성' if s.get('image_kind')=='generated' else (s.get('image_source') or s.get('image_credit') or '기관 제공')
                 platform=e(platform.removeprefix('출처 | ').strip())
-                blocks.append(f'<article class="slide magazine-interior edition-{variant} page-{j} has-image" id="{sid}" style="{colors}"><header><span>{e(data["institution"])}</span>{draft}</header><div class="category">{label}</div><h1>{e(s["title"])}</h1><div class="art">{art}</div><p>{e(s["body"])}</p><div class="details">{details}</div><footer><span>{j:02d} / {len(post["slides"]):02d}</span><span>출처 | {platform}</span></footer></article>')
+                blocks.append(f'<article class="slide article-body edition-{variant} page-{page_num} has-image" id="{sid}" style="{colors}"><div class="art">{art}</div><div class="article-copy"><div class="category">{label}</div><h1>{e(s["title"])}</h1><p>{e(s["body"])}</p><footer><span>{page_num:02d} / {page_total:02d}</span><span>출처 | {platform}</span></footer></div></article>')
                 continue
             blocks.append(f'<article class="slide {s["layout"]} preset-{data["style"]}{has_image}" id="{sid}" style="{colors}"><header><span>{e(data["institution"])}</span>{draft}</header><div class="category">{e(post["category"])}</div><h1>{e(s["title"])}</h1><div class="art">{art}</div><p>{e(s["body"])}</p><div class="details">{details}</div><footer><span> {i:02d} · {e(post["category"])}</span><span>{credit or (str(j).zfill(2)+" / "+str(len(post["slides"])).zfill(2))}</span></footer></article>')
     (edit/'index.html').write_text('<!doctype html><html lang="ko"><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head><body>'+''.join(blocks)+'</body></html>',encoding='utf-8')
@@ -104,12 +117,13 @@ def render(out,browser_path):
         page.set_content(source); page.evaluate('document.fonts.ready')
         for slide in page.locator('.slide').all():
             sid=slide.get_attribute('id'); files.append(sid)
-            issues=slide.evaluate('''el=>{const r=el.getBoundingClientRect();let a=[];if(r.width!==1080||r.height!==1350)a.push('wrong size');for(const c of el.querySelectorAll('header,h1,p,footer,.category,.art,.details')){if(getComputedStyle(c).display==='none')continue;let b=c.getBoundingClientRect();if(b.bottom>r.bottom||b.right>r.right||b.left<r.left||b.top<r.top||(!c.classList.contains('art')&&c.scrollWidth>c.clientWidth+2))a.push('overflow '+c.tagName+' '+c.className)}if(el.classList.contains('signature-cover')){let spans=el.querySelectorAll('h1>span');if(spans.length!==2)a.push('cover headline must have two lines');for(const s of spans)if(s.scrollWidth>s.clientWidth+2)a.push('cover headline line overflow');for(const c of el.querySelectorAll('.cover-brand,.cover-eyebrow,.cover-credit'))if(c.scrollWidth>c.clientWidth+2)a.push('cover label overflow');if(el.querySelector('p,.details'))a.push('cover contains body copy')}for(const im of el.querySelectorAll('img'))if(!im.complete||!im.naturalWidth)a.push('image failed');return a}''')
+            issues=slide.evaluate('''el=>{const r=el.getBoundingClientRect();let a=[];if(r.width!==1080||r.height!==1350)a.push('wrong size');for(const c of el.querySelectorAll('header,h1,p,footer,.category,.art,.details')){if(getComputedStyle(c).display==='none')continue;let b=c.getBoundingClientRect();if(b.bottom>r.bottom||b.right>r.right||b.left<r.left||b.top<r.top||(!c.classList.contains('art')&&c.scrollWidth>c.clientWidth+2))a.push('overflow '+c.tagName+' '+c.className)}if(el.classList.contains('signature-cover')){let spans=el.querySelectorAll('h1>span');if(spans.length!==2)a.push('cover headline must have two lines');for(const s of spans)if(s.scrollWidth>s.clientWidth+2)a.push('cover headline line overflow');for(const c of el.querySelectorAll('.cover-brand,.cover-eyebrow,.cover-credit'))if(c.scrollWidth>c.clientWidth+2)a.push('cover label overflow');if(el.querySelector('p,.details'))a.push('cover contains body copy');const brand=el.querySelector('.cover-brand');if(!brand||brand.children.length||el.querySelector('svg,.logo,.brand-logo'))a.push('brand must be plain text only')}if(el.classList.contains('article-body')){const art=el.querySelector('.art'),copy=el.querySelector('.article-copy');if(!art||!copy||art.getBoundingClientRect().bottom>copy.getBoundingClientRect().top+1||copy.scrollHeight>copy.clientHeight+2)a.push('article photo/text layout overflow');if(!el.querySelector('p')?.textContent.trim())a.push('article body missing')}for(const im of el.querySelectorAll('img'))if(!im.complete||!im.naturalWidth)a.push('image failed');return a}''')
             if issues: errors.append({'slide':sid,'issues':issues})
             slide.screenshot(path=str(png/(sid+'.png')),animations='disabled')
         browser.close()
-    covers=[s for s in files if s.endswith('slide-01')]
-    expected=len(json.loads((out/'editable/feed.json').read_text(encoding='utf-8'))['posts'])
+    feed=json.loads((out/'editable/feed.json').read_text(encoding='utf-8'))
+    covers=[] if feed.get('body_only',False) else [s for s in files if s.endswith('slide-01')]
+    expected=0 if feed.get('body_only',False) else len(feed['posts'])
     if len(covers)!=expected: errors.append({'issue':f'expected {expected} covers'})
     def img(s):
         image_path=png/(s+'.png')

@@ -27,7 +27,8 @@ with tempfile.TemporaryDirectory() as directory:
     assert "<span>블록 하나로 만드는</span><span>나만의 작은 세상</span>" in markup
     assert "오늘의 놀이 기록" in markup and "햇살숲" in markup
     assert "출처 | AI 생성" in markup
-    assert "<p>" not in markup
+    assert '<div class="cover-brand">햇살숲</div>' in markup
+    assert "<svg" not in markup and "<p>" not in markup
     assert render(out,None), (out/"review-report.json").read_text(encoding="utf-8")
     assert (out/"png/post-01-slide-01.png").is_file()
     for field,value in [("title","한 줄 제목"),("body","표지 설명은 금지")]:

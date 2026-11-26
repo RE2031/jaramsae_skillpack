@@ -12,7 +12,7 @@ with tempfile.TemporaryDirectory() as tmp:
         pixels=b''.join(b'\0'+bytes((70+i*25,140,185))*w for _ in range(h))
         path=root/f'fixture{i}.png'
         path.write_bytes(b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',w,h,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(pixels))+chunk(b'IEND',b''))
-        slides.append({'title':'모래로 만드는\n작은 세상' if i==0 else '놀이 속 작은 발견','body':'' if i==0 else '모래를 담고 뒤집으며 다양한 모양을 살펴보았어요.','layout':'fullbleed-photo','eyebrow':'오늘의 놀이 기록','image':path.name,'image_approved':True,'image_kind':'generated','image_credit':'Synthetic fixture'})
+        slides.append({'title':'모래로 만드는\n작은 세상' if i==0 else '놀이 속 작은 발견','body':'' if i==0 else '모래를 양동이에 담았어요. 뒤집으며 다양한 모양을 살펴보았어요.','layout':'fullbleed-photo','eyebrow':'오늘의 놀이 기록','image':path.name,'image_approved':True,'image_kind':'generated','image_credit':'Synthetic fixture'})
     data={'institution':'햇살숲','goal':'test','style':'bold-photo-editorial','brand':{'primary':'#263B50','background':'#EAF6FD','accent':'#A8D8F0'},'draft':True,'posts':[{'category':'놀이','purpose':'test','caption':'fixture','hashtags':[],'slides':slides}]}
     source=root/'feed.json';folders=[]
     for variant in ['signature','modern','story','creative']:
@@ -21,9 +21,19 @@ with tempfile.TemporaryDirectory() as tmp:
         out=root/variant;build(source,out);assert render(out,None),(out/'review-report.json').read_text()
         markup=(out/'editable/index.html').read_text()
         assert 'signature-cover' in markup
-        if variant!='signature': assert 'magazine-interior edition-'+variant in markup
-        else: assert 'magazine-interior' not in markup
+        assert markup.count('article-body edition-'+variant)==3
+        assert '<div class="cover-brand">햇살숲</div>' in markup
+        assert '<svg' not in markup
         folders.append(out)
     build_editor(folders,root/'editor.html')
     assert (root/'editor.html').is_file()
-    print('FOUR_EDITION_TEST_PASSED')
+    data['body_only']=True
+    data['posts'][0]['slides']=slides[1:]
+    source.write_text(json.dumps(data,ensure_ascii=False),encoding='utf-8')
+    out=root/'body-only'
+    build(source,out);assert render(out,None),(out/'review-report.json').read_text()
+    markup=(out/'editable/index.html').read_text()
+    assert 'signature-cover' not in markup and '02 / 04' in markup
+    import subprocess,sys
+    subprocess.run([sys.executable,str(Path(__file__).with_name('quality_check.py')),'--out',str(out)],check=True)
+    print('FOUR_EDITION_AND_BODY_ONLY_TEST_PASSED')

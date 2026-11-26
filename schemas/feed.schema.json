@@ -202,6 +202,10 @@
         "creative"
       ],
       "description": "Optional TIO-first visual edition for bold-photo-editorial; default signature preserves legacy styling."
+    },
+    "body_only": {
+      "type": "boolean",
+      "description": "Only article interiors, page numbers start at 02."
     }
   },
   "allOf": [
@@ -215,6 +219,34 @@
         "properties": {
           "style": {
             "const": "bold-photo-editorial"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "body_only"
+        ],
+        "properties": {
+          "body_only": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "style": {
+            "const": "bold-photo-editorial"
+          },
+          "posts": {
+            "items": {
+              "properties": {
+                "slides": {
+                  "maxItems": 3
+                }
+              }
+            }
           }
         }
       }

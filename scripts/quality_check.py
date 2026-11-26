@@ -48,11 +48,11 @@ def main():
         if not pngs:
             issues.append("no individual slide PNGs were generated")
         preview = (out / "preview.html").read_text(encoding="utf-8")
-        if preview.count("<img ") != expected + len(feed["posts"]):
+        if preview.count("<img ") != expected + (0 if feed.get("body_only",False) else len(feed["posts"])):
             issues.append("preview image count does not match covers + all slides")
         if 'src="png/' in preview or 'href="png/' in preview:
             issues.append("preview still contains fragile relative PNG paths")
-        if preview.count("data:image/png;base64,") < expected + len(feed["posts"]):
+        if preview.count("data:image/png;base64,") < expected + (0 if feed.get("body_only",False) else len(feed["posts"])):
             issues.append("preview does not embed all PNG images")
     except Exception as exc:
         issues.append(f"could not inspect render output: {exc}")
