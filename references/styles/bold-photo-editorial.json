@@ -20,7 +20,7 @@
     "canvas": "1080x1350 portrait 4:5",
     "image": "single full-bleed photograph fills the entire canvas; no card frame or outer margin",
     "overlay": "subtle top readability treatment and strong dark gradient over the lower 40-50 percent",
-    "brand": "first slide: exact institution name centered near the top",
+    "brand": "Institution name as plain text only; no logos",
     "eyebrow": "small, light-weight introductory phrase above the headline",
     "headline": "first slide exactly two explicit bold white lines; later slides may vary",
     "supporting_copy": "none on first slide; concise body permitted on later slides",
@@ -79,7 +79,7 @@
       1080,
       1350
     ],
-    "brand": "exact institution name from director",
+    "brand": "Exact institution name as plain white text only; no logos, icons, symbols, emoji or graphics",
     "eyebrow": "one activity label, e.g. 오늘의 놀이 기록",
     "headline": "exactly two explicitly separated bold white lines",
     "supporting_copy": "none; move to subsequent slides or caption",
