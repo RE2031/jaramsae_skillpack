@@ -28,6 +28,8 @@ jobs:
       - name: Check style preset consistency
         run: python scripts/test_style_presets.py
       - run: python -m playwright install --with-deps chromium
+      - name: Render signature cover smoke test
+        run: python scripts/test_signature_cover.py
       - name: Render and verify demo
         run: python scripts/pipeline.py examples/demo.json --out output/demo-v06
       - uses: actions/upload-artifact@v4
