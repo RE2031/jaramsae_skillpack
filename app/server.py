@@ -39,15 +39,6 @@ MIME = {
 }
 
 
-def load_profile():
-    for path in sorted((ROOT / 'profiles').glob('*/brand-profile.json')):
-        try:
-            return json.loads(path.read_text(encoding='utf-8'))
-        except Exception:
-            continue
-    return {}
-
-
 def title_words(text):
     return [w for w in ' '.join((text or '').split()).split(' ')
             if w and w not in ('·', '|', '/', '-')]
@@ -93,9 +84,9 @@ def save_photo(data_url, path):
     return path
 
 
-def build_feed(payload, run_dir, profile):
-    institution = (payload.get('displayName') or profile.get('institution') or '').strip()
-    if not institution:
+def build_feed(payload, run_dir):
+    name = (payload.get('displayName') or '').strip()
+    if not name:
         raise ValueError('표시 이름을 입력해 주세요.')
     slides = payload.get('slides') or []
     if len(slides) != 4:
@@ -164,18 +155,18 @@ def build_feed(payload, run_dir, profile):
                 (run_dir/entry['video']).write_bytes(base64.b64decode(slide['video'].split(',',1)[-1],validate=True))
         feed_slides.append(entry)
 
-    head = ' '.join(part for part in [institution, activity, '기록입니다.'] if part)
+    head = ' '.join(part for part in [name, activity, '기록입니다.'] if part)
     paragraphs = [head] + [text for text in captions if text]
     if any_example:
         paragraphs.append('사진에는 실제 게시물 대상을 촬영하지 않은 예시 이미지가 포함되어 있습니다.')
     caption = '\n\n'.join(paragraphs)
-    hashtags = ['#' + re.sub(r'[^\w]','',value) for value in (institution,activity) if re.search(r'\w',value)]
+    hashtags = ['#' + re.sub(r'[^\w]','',value) for value in (name,activity) if re.search(r'\w',value)]
 
     feed = {
-        'institution': institution,
+        'display_name': name,
         'goal': activity,
         'style': 'bold-photo-editorial',
-        'brand': {key:(profile.get('colors') or profile.get('brand') or {}).get(key,value) for key,value in BRAND.items()},
+        'brand': dict(BRAND),
         'draft': True,
         'posts': [{
             'category': activity,
@@ -198,7 +189,6 @@ def build_feed(payload, run_dir, profile):
 
 
 def handle_render(payload):
-    profile = load_profile()
     selection = payload.get('selection') or 'all'
     if selection != 'all' and selection not in EDITIONS:
         raise ValueError('본문 스타일을 선택해 주세요.')
@@ -207,7 +197,7 @@ def handle_render(payload):
     run_dir = RUNS / run_id
     run_dir.mkdir(parents=True)
 
-    feed, caption, hashtags, warnings = build_feed(payload, run_dir, profile)
+    feed, caption, hashtags, warnings = build_feed(payload, run_dir)
     feed_path = run_dir / 'feed.json'
     feed_path.write_text(json.dumps(feed, ensure_ascii=False, indent=2), encoding='utf-8')
 
@@ -340,8 +330,6 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_file(APP / 'static' / 'index.html')
         if path == '/studio-style.css':
             return self.send_file(ROOT/'templates/style.css')
-        if path == '/api/profile':
-            return self.send_json({'profile': load_profile()})
         if path.startswith('/files/'):
             target = (OUT / path[len('/files/'):]).resolve()
             if not target.is_relative_to(OUT.resolve()):

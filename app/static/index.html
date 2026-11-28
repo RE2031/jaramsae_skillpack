@@ -5,72 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>카드뉴스 스튜디오</title>
 <style>
-  :root{--bg:#F6F1E7;--ink:#22261F;--muted:#6F6A5E;--line:#DED5C4;--accent:#B4843C;--card:#FFFDF8}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;line-height:1.5}
-  header{max-width:1320px;margin:0 auto;padding:28px 32px 8px}
-  header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.02em}
-  header p{margin:0;color:var(--muted);font-size:14px}
-  main{max-width:1320px;margin:0 auto;padding:16px 32px 72px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
-  @media (max-width:1040px){main{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
-  .card h2{margin:0 0 12px;font-size:15px;display:flex;gap:8px;align-items:baseline}
-  .card h2 span{font-size:12px;color:var(--muted);font-weight:400}
-  .row{display:grid;gap:14px;grid-template-columns:150px minmax(0,1fr)}
-  @media (max-width:560px){.row{grid-template-columns:1fr}}
-  .shot{position:relative;background:#EFEADF;border:1px dashed var(--line);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;text-align:center;cursor:pointer}
-  .shot.cover{aspect-ratio:4/5}
-  .shot.body{aspect-ratio:1.41/1}
-  .shot img{width:100%;height:100%;object-fit:cover;display:block}
-  .field{margin-bottom:10px}
-  .lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
-  input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;background:#fff;color:inherit;resize:vertical}
-  textarea{min-height:54px}
-  .hint{font-size:11px;color:var(--muted);margin:4px 0 0}
-  .rowline{display:flex;gap:8px;align-items:flex-start;font-size:13px}
-  .rowline input{margin-top:3px}
-  button{font:inherit;border-radius:9px;border:1px solid transparent;padding:10px 16px;cursor:pointer;background:#fff}
-  button.primary{background:var(--ink);color:#fff;font-weight:600}
-  button.primary:disabled{opacity:.55;cursor:progress}
-  button.ghost{border-color:var(--line)}
-  #status{font-size:13px;color:var(--muted);min-height:20px;margin:10px 0 0}
-  #results{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media (max-width:700px){#results{grid-template-columns:1fr}}
-  .thumb{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px}
-  .thumb img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:6px;background:#EFEADF}
-  .pick{display:flex;gap:8px;align-items:center;font-size:13px}
-  .bar{grid-column:1/-1}
-  .bar .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .bar a{text-decoration:none;padding:10px 16px;border:1px solid var(--line);border-radius:9px;color:inherit;font-size:14px}
-  [hidden]{display:none!important}
-  .style-choices,.render-actions{display:flex;gap:8px;flex-wrap:wrap}
-  .style-choices [aria-pressed=true]{background:var(--ink);color:white}
-  .preview{width:min(240px,100%);aspect-ratio:4/5;position:relative;overflow:hidden;margin:12px auto;background:#e6ddd1;border-radius:8px}
-  .preview iframe{position:absolute;width:1080px;height:1350px;transform-origin:top left;border:0}
-  .thumb video{width:100%;aspect-ratio:4/5;display:block;background:#181815;border-radius:6px}
-  .thumb:has(video){grid-template-columns:repeat(2,minmax(0,1fr))}
-  details{margin-top:12px;font-size:13px}
-  details pre{white-space:pre-wrap;font:inherit;margin:8px 0 0;color:var(--muted)}
+:root{color-scheme:light;--paper:#f6f7fb;--ink:#151d31;--sub:#4b576d;--edge:#dbe1ed;--blue:#214bd7;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "Malgun Gothic",system-ui,sans-serif}
+button,input,textarea{font:inherit}
+button,a{touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #9db5ff;outline-offset:2px}
+.topbar{background:#151d31;color:white}
+.page-width{max-width:1350px;margin:auto;padding-inline:clamp(15px,4vw,46px)}
+.topbar .page-width{padding-block:23px 25px}
+.topbar h1{font-size:clamp(24px,4vw,35px);letter-spacing:-.05em;margin:0}
+.topbar p{color:#c8d2e8;font-size:14px;margin:6px 0 0}
+main{padding-block:24px 60px}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(400px,.95fr);gap:24px;align-items:start}
+.editor-column,.preview-column{min-width:0}
+.preview-column{position:sticky;top:15px;grid-column:2;grid-row:1/span 2}
+.card{min-width:0;background:var(--card);border:1px solid var(--edge);border-radius:15px;padding:19px;margin:0 0 14px}
+.card h2{margin:0 0 13px;font-size:17px;letter-spacing:-.025em}
+.card h2 span{font-weight:400;color:var(--sub);font-size:12px;margin-left:8px}
+.settings{display:grid;grid-template-columns:1fr 1.3fr;gap:14px}
+.settings h2{grid-column:1/-1;margin:0}
+.row{display:grid;gap:16px;grid-template-columns:minmax(106px,142px) minmax(0,1fr)}
+.shot{position:relative;display:grid;place-items:center;overflow:hidden;background:#eef1f8;border:1px dashed #b4bfd5;border-radius:10px;color:var(--sub);font-size:12px;cursor:pointer}
+.shot.cover,.shot.body{aspect-ratio:4/5}
+.shot img{display:block;width:100%;height:100%;object-fit:cover}
+.field{margin:0 0 9px}
+.settings .field{margin:0}
+.lbl{display:block;color:var(--sub);font-size:12px;font-weight:700;margin:0 0 5px}
+input[type=text],textarea{width:100%;min-width:0;padding:8px 10px;border:1px solid var(--edge);border-radius:7px;background:white;color:var(--ink)}
+textarea{display:block;min-height:48px;resize:vertical}
+input[type=file]{max-width:100%;font-size:13px}
+.hint{font-size:12px;color:var(--sub);margin:7px 0}
+.rowline{display:flex;gap:7px;align-items:flex-start;font-size:12px}
+.rowline input{margin-top:3px}
+button,.result-link{border:1px solid var(--edge);border-radius:8px;padding:8px 12px;background:#fff;color:var(--ink);font-weight:700;cursor:pointer}
+button.primary,.result-link{background:var(--blue);border-color:var(--blue);color:white}
+button:disabled{opacity:.6;cursor:wait}
+[aria-pressed=true]{color:var(--blue);background:#eaf0ff;border-color:#8ea8f5}
+[hidden]{display:none!important}
+.style-choices,.card-choices,.render-actions{display:flex;flex-wrap:wrap;gap:7px}
+.style-choices button{font-size:13px;text-align:left}
+.live-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.live-cards h3{font-size:12px;color:var(--sub);margin:0 0 5px}
+.preview{width:100%;aspect-ratio:4/5;overflow:hidden;position:relative;background:#e9edf8;border-radius:7px}
+.preview iframe{position:absolute;width:1080px;height:1350px;transform-origin:top left;border:0}
+.card-choices button{padding:4px 8px;font-size:12px}
+.style-settings{padding:12px 0 0}
+#status{color:var(--sub);font-size:13px;min-height:20px;margin:8px 0 0}
+.results{margin-top:28px}
+#results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#results .card{margin:0}
+.result-link{display:inline-block;margin-top:12px;text-decoration:none;font-size:13px}
+.thumb{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.thumb img,.thumb video{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:5px;background:#151d31}
+.thumb:has(video){grid-template-columns:repeat(2,minmax(0,1fr))}
+.bar{grid-column:1/-1}
+.bar pre{white-space:pre-wrap;font:inherit;margin-bottom:0}
+@media(max-width:930px){.workspace{grid-template-columns:1fr}.preview-column{position:static;grid-column:1;grid-row:2}.live-cards{max-width:480px}}
+@media(max-width:550px){.settings,#results{grid-template-columns:1fr}.row{grid-template-columns:1fr}.shot{max-width:155px}.card{padding:14px}}
 </style>
 </head>
 <body>
-<header>
+<header class="topbar"><div class="page-width">
   <h1>인스타그램 카드뉴스 스튜디오</h1>
   <p>표지 한 장과 본문 세 장을 만들고, 같은 자료로 본문 스타일을 비교할 수 있습니다.</p>
-</header>
-<main>
-  <section>
-    <div class="card">
+</div></header>
+<main class="page-width">
+  <div class="workspace">
+  <section class="editor-column" aria-label="게시물 자료">
+    <div class="card settings">
+      <h2>게시물 정보</h2>
       <div class="field"><label class="lbl" for="displayName">표시 이름</label><input id="displayName" type="text" placeholder="계정 또는 브랜드 이름"></div>
       <div class="field"><label class="lbl" for="activity">이번 게시물 주제</label><input id="activity" type="text" placeholder="동네 독립서점 인터뷰"></div>
     </div>
     <div id="cover-slot"></div>
+  </section>
+  <section class="preview-column" aria-label="레이아웃 미리보기">
     <div class="card">
-      <h2>공통 표지 미리보기</h2>
-      <div class="preview" id="cover-preview"></div>
-      <h2>본문 스타일</h2>
-      <div class="style-choices" id="styles"></div>
-      <div class="preview" id="body-preview"></div>
+      <h2>레이아웃 미리보기</h2>
+      <div class="live-cards">
+        <div><h3>공통 Signature 표지</h3><div class="preview" id="cover-preview"></div></div>
+        <div><h3>본문</h3><div class="preview" id="body-preview"></div></div>
+      </div>
+      <div class="style-choices" id="styles" aria-label="본문 스타일"></div>
+      <p class="hint">미리 볼 카드</p>
+      <div class="card-choices" id="preview-cards" aria-label="미리 보기 카드"></div>
       <p class="hint" id="style-help"></p>
       <div class="field" data-style="overlay" hidden><label class="lbl" for="logo">본문 로고 (선택)</label><input id="logo" type="file" accept="image/png,image/jpeg,image/webp"><p class="hint">로고가 비어 있으면 표시 이름을 사용합니다.</p></div>
       <div data-style="interview" hidden>
@@ -78,11 +97,14 @@
         <div class="field"><label class="lbl" for="transcript">인터뷰 원문</label><textarea id="transcript" maxlength="20000"></textarea><p class="hint">인용문 칸에는 원문의 연속된 문장을 그대로 붙여 넣으세요.</p></div>
       </div>
     </div>
+  </section>
+  <section class="editor-column" aria-label="본문 자료">
     <div id="slots"></div>
     <div class="render-actions"><button id="render" class="primary">선택한 스타일 만들기</button><button id="compare" class="ghost">4종 비교하기</button></div>
     <p id="status" role="status"></p>
   </section>
-  <section id="results" hidden></section>
+  </div>
+  <section class="results" id="results" aria-label="제작한 카드" hidden></section>
 </main>
 <script>
 const SLOT_LABEL = ['표지 사진', '본문 1', '본문 2', '본문 3'];
@@ -92,7 +114,7 @@ const styles = {
   video: ['C · 영상 매거진형', '영상 한 장을 앞뒤 정지 카드 사이에 배치하면 맥락과 결론을 읽기 쉽습니다. 영상이 비어 있으면 사진을 사용합니다.'],
   interview: ['D · 인터뷰 지면형', '인물과 맥락 소개 → 원문에서 가져온 답변 → 후속 질문 또는 마무리'],
 };
-const state = { photos: [null, null, null, null], style: 'playful', logo: '' };
+const state = { photos: [null, null, null, null], style: 'playful', logo: '', preview: 2 };
 const $ = id => document.getElementById(id);
 const val = id => $(id).value.trim();
 const readFile = file => file ? new Promise((resolve, reject) => {
@@ -105,12 +127,14 @@ function setStatus(text) { $('status').textContent = text; }
 function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 }
-fetch('/api/profile').then(r => r.json()).then(data => {
-  if (!$('displayName').value) $('displayName').value = data.profile.institution || '';
-  showPreview();
-}).catch(() => {});
-
 const slots = document.getElementById('slots');
+for (let i=1;i<4;i+=1) {
+  const button=document.createElement('button');
+  button.textContent='본문 '+i;
+  button.dataset.card=i;
+  button.onclick=()=>{state.preview=i;showPreview();};
+  $('preview-cards').append(button);
+}
 SLOT_LABEL.forEach((label, i) => {
   const card = document.createElement('div');
   card.className = 'card';
@@ -221,19 +245,32 @@ function showPreview() {
   const coverFrame = $('cover-preview').firstChild;
   if (coverFrame.srcdoc !== cover) coverFrame.srcdoc = cover;
   const style = state.style;
-  const i = 2;
+  const i = state.preview;
+  for(const button of $('preview-cards').children) button.setAttribute('aria-pressed',Number(button.dataset.card)===i);
   const art = `<div class="art">${photo(i)}</div>`;
-  const headline = esc(val('title-2') || '책방이 고른 한 문장');
-  const body = esc(val('body-2') || val('desc-2') || '이 동네에서 읽는 즐거움을 나누는 법을 물었습니다.');
-  const topic = '<div class="category">이야기 속 한 장면</div>';
+  const headline = esc(val(`title-${i}`) || '책방이 고른 한 문장');
+  const body = esc(val(`body-${i}`) || val(`desc-${i}`) || '이 동네에서 읽는 즐거움을 나누는 법을 물었습니다.');
+  const topic = '<div class="category">'+['','이야기의 시작','이야기 속 한 장면','이야기를 마치며'][i]+'</div>';
   const copy = extra => `<div class="mag-copy">${topic}<h1>${headline}</h1><p>${body}</p>${extra || ''}</div>`;
   let content;
-  if (style === 'playful') content = art + '<span class="spark">✦</span><div class="photo-aside">'+esc(val('aside-2') || '저부터 읽어보실래요?')+'</div>' + copy();
+  if (style === 'playful') {
+    const aside=val(`aside-${i}`) || (!state.photos[i] && i===2 ? '저부터 읽어보실래요?' : '');
+    content=art + '<span class="spark">✦</span>'+(aside ? '<div class="photo-aside">'+esc(aside)+'</div>' : '')+copy();
+  }
   if (style === 'overlay') content = art + '<div class="media-shade"></div><div class="overlay-brand">'+(state.logo ? `<img src="${esc(state.logo)}" alt="">` : `<span>${brand}</span>`)+'</div>' + copy();
-  if (style === 'video') content = art + '<div class="media-shade"></div>' + copy('<div class="video-subtitle">'+esc(val('subtitle-2') || '영상이 담을 한 문장')+'</div>');
-  if (style === 'interview') content = '<div class="issue">'+esc(val('issue') || 'VOL. 01')+'</div><div class="section-label">INTERVIEW</div>' + art + copy('<div class="interview-question"><b>Q.</b> '+esc(val('question-2') || '책방을 연 이유는 무엇인가요?')+'</div><blockquote><b>A.</b> '+esc(val('quote-2') || '함께 읽을 자리를 만들고 싶었어요.')+'</blockquote>');
+  if (style === 'video') content = copy() + art + ((!state.photos[i] && i===2) || $(`video-${i}`).files.length ? '<div class="video-subtitle">'+esc(val(`subtitle-${i}`) || val(`title-${i}`) || '영상이 담을 한 문장')+'</div>' : '');
+  const sample = !state.photos[i] && i===2;
+  const hasQuote = style === 'interview' && (val(`quote-${i}`) || sample);
+  if (style === 'interview') {
+    const question=val(`question-${i}`) || (sample ? '책방을 연 이유는 무엇인가요?' : '');
+    const quote=val(`quote-${i}`) || (sample ? '함께 읽을 자리를 만들고 싶었어요.' : '');
+    const qa=(question ? '<div class="interview-question"><b>Q.</b> '+esc(question)+'</div>' : '')
+      +(quote ? '<blockquote><b>A.</b> '+esc(quote)+'</blockquote>' : '');
+    content='<div class="issue">'+esc(val('issue') || 'VOL. 01')+'</div><div class="section-label">INTERVIEW</div>'+art
+      +`<div class="mag-copy">${qa}${topic}<h1>${headline}</h1><p>${body}</p></div>`;
+  }
   const frame = $('body-preview').firstChild;
-  const preview = wrapper(`<article class="slide magazine-card magazine-${style}" ${colors}>${content}<footer><span>03 / 04</span><span>출처 | ${credit(i)}</span></footer></article>`);
+  const preview = wrapper(`<article class="slide magazine-card magazine-${style}${hasQuote ? ' has-quote' : ''}" ${colors}>${content}<footer><span>0${i+1} / 04</span><span>출처 | ${credit(i)}</span></footer></article>`);
   if (frame.srcdoc !== preview) frame.srcdoc = preview;
 }
 $('logo').onchange = async () => {
@@ -249,7 +286,7 @@ $('logo').onchange = async () => {
   showPreview();
 };
 let previewTimer;
-document.querySelector('main>section').addEventListener('input', () => {
+document.querySelector('main').addEventListener('input', () => {
   clearTimeout(previewTimer);
   previewTimer = setTimeout(showPreview, 100);
 });
@@ -299,7 +336,7 @@ function showResults(data) {
       <div class="thumb">${edition.slides.map(({poster,video},i) => video
         ? `<video src="${video}" poster="${poster}" controls muted playsinline preload="metadata" aria-label="${i+1}장 영상"></video>`
         : `<img src="${poster}" alt="${edition.name} ${i+1}장">`).join('')}</div>
-      <a href="${data.editor}#${edition.id}" target="_blank" rel="noopener">${edition.name} 편집·저장</a>`;
+      <a class="result-link" href="${data.editor}#${edition.id}" target="_blank" rel="noopener">${edition.name} 편집·저장</a>`;
     box.appendChild(column);
   });
   const bar = document.createElement('div');

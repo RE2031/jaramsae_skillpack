@@ -1,6 +1,45 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>자람새 | 게시물 편집</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f7f8fa;color:#223344;font:15px/1.55 system-ui,"Noto Sans CJK KR",sans-serif}header.top{position:sticky;top:0;z-index:12;background:#fff;border-bottom:1px solid #dce2e8;padding:16px 28px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}.logo{font-size:20px;font-weight:800;letter-spacing:-1px}.muted{color:#667482;font-size:13px}.spacer{flex:1}button,input,textarea{font:inherit}button{cursor:pointer;border:1px solid #ccd5dd;background:white;color:#223344;padding:8px 13px;border-radius:7px;font-weight:600}button.primary{background:#29495f;color:white;border-color:#29495f}button:focus-visible{outline:3px solid #92c8ed}main{max-width:1550px;margin:auto;padding:26px 28px 60px}h1{font-size:27px;letter-spacing:-1px;margin:0 0 4px}h2{font-size:18px;margin:0}.version{background:#fff;border:1px solid #dce2e8;border-radius:12px;padding:18px;margin-top:18px}.version.chosen{border:2px solid #488ab3;padding:17px}.version-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}.version-head .pick{margin-left:auto}.scroll{overflow-x:auto;padding-bottom:4px}.four{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;min-width:768px}.cell{min-width:0}.canvas{width:100%;aspect-ratio:4/5;overflow:hidden;background:#e5e9ec;position:relative;cursor:pointer;outline:1px solid #e2e5e9}.canvas:hover,.canvas.active{outline:2px solid #488ab3}.stage{position:absolute;left:0;top:0;width:1080px;height:1350px;transform-origin:top left;font-family:"Noto Sans CJK KR","Malgun Gothic",sans-serif}.cellbar{display:flex;align-items:center;justify-content:space-between;padding-top:8px;font-size:12px;color:#687684}.cellbar button{padding:4px 9px;font-size:12px}.panel{position:fixed;inset:var(--top-height,75px) 0 0 auto;width:min(420px,100%);background:#fff;z-index:10;border-left:1px solid #dce2e8;box-shadow:-6px 0 28px #11223322;overflow:auto;padding:20px;display:none}.panel.open{display:block}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:8px}.field{display:block;margin:14px 0 0;font-size:13px;font-weight:650}.field input:not([type=range]),.field textarea{display:block;width:100%;padding:8px;border:1px solid #cbd5dd;border-radius:6px;margin-top:5px;background:white}.field textarea{resize:vertical;min-height:62px}.field input[type=range]{display:block;width:100%;margin-top:6px}.notice{background:#f0f5f8;padding:10px 12px;border-radius:6px;color:#405a6a;font-size:12px;margin-top:14px}.panel .canvas{max-width:230px;margin:15px auto}.panel .stage{pointer-events:none}#status{margin:6px 0;color:#385c70;font-size:13px}body.editing main{margin-right:min(420px,35vw)}@media(max-width:900px){body.editing main{margin-right:0}main{padding:18px 12px}header.top{padding:12px}.panel{width:min(420px,100%)}}
-</style></head><body><header class="top"><div class="logo">자람새 · 게시물 편집</div><span class="muted" id="chosenLabel"></span><span class="spacer"></span><button id="saveProject">편집 프로젝트 저장</button><button id="saveSelected">선택안 HTML 저장</button><button id="exportMedia" class="primary" hidden>선택안 PNG·MP4 저장</button></header><main><h1>시안 선택 및 편집</h1><div class="muted">사진 또는 편집 버튼을 눌러 문구와 크롭을 수정하세요. 여러 시안이 있다면 저장할 본문 스타일을 선택하세요.</div><div id="status" role="status"></div><div id="versions"></div></main><aside id="panel" class="panel" aria-label="슬라이드 편집"><div class="panelhead"><h2 id="editTitle">슬라이드 편집</h2><button id="closePanel">닫기</button></div><div id="bigPreview"></div><div id="fields"></div><div class="notice" id="warning">수정 내용은 즉시 미리보기에 반영됩니다. 편집을 이어가려면 프로젝트 저장 버튼으로 HTML을 저장하세요.</div><button id="resetSlide" style="margin-top:14px">이 슬라이드 원래대로</button></aside><script id="project" type="application/json">__PROJECT__</script><script>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>카드뉴스 편집실</title><style>
+:root{color-scheme:light;--paper:#eef1f8;--ink:#151d31;--sub:#4b576d;--border:#dbe1ed;--blue:#214bd7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "Malgun Gothic",system-ui,sans-serif}
+header.top{position:sticky;top:0;z-index:12;background:#151d31;color:white;border-bottom:1px solid #303a51;padding:14px clamp(14px,4vw,42px);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.logo{font-size:20px;font-weight:850;letter-spacing:-.03em}
+.muted{color:var(--sub);font-size:13px}
+.top .muted{color:#d1daed}
+.spacer{flex:1}
+button,input,textarea{font:inherit}
+button{border:1px solid var(--border);border-radius:8px;padding:8px 12px;background:#fff;color:var(--ink);font-weight:700;cursor:pointer}
+button.primary{background:var(--blue);border-color:var(--blue);color:white}
+button:focus-visible,a:focus-visible{outline:3px solid #9db5ff;outline-offset:2px}
+main{max-width:1450px;margin:auto;padding:26px clamp(14px,4vw,42px) 65px}
+h1{font-size:30px;letter-spacing:-.04em;margin:0 0 3px}
+h2{font-size:18px;margin:0}
+.version{background:white;border:1px solid var(--border);border-radius:13px;padding:16px;margin-top:15px}
+.version.chosen{outline:2px solid var(--blue);outline-offset:-2px}
+.version-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.version-head .pick{margin-left:auto}
+.scroll{overflow-x:auto;padding-bottom:5px}
+.four{display:grid;grid-template-columns:repeat(4,minmax(155px,1fr));gap:10px;min-width:660px}
+.cell{min-width:0}
+.canvas{width:100%;aspect-ratio:4/5;overflow:hidden;background:#e5e9ef;position:relative;cursor:pointer;border-radius:6px}
+.canvas:hover,.canvas.active{outline:2px solid var(--blue)}
+.stage{position:absolute;inset:0 auto auto 0;width:1080px;height:1350px;transform-origin:top left;font-family:"Noto Sans CJK KR","Malgun Gothic",sans-serif}
+.cellbar{display:flex;align-items:center;justify-content:space-between;gap:5px;padding-top:7px;font-size:12px;color:var(--sub)}
+.cellbar button{padding:4px 8px;font-size:12px}
+.panel{position:fixed;inset:var(--top-height,70px) 0 0 auto;width:min(410px,100%);background:white;z-index:10;border-left:1px solid var(--border);box-shadow:-8px 0 32px #151d3129;overflow:auto;padding:17px;display:none}
+.panel.open{display:block}
+.panelhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.field{display:block;margin:13px 0 0;font-size:13px;font-weight:700}
+.field input:not([type=range]),.field textarea{display:block;width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;margin-top:4px;background:white}
+.field textarea{resize:vertical;min-height:59px}
+.field input[type=range]{display:block;width:100%}
+.notice{background:#edf2ff;padding:9px 11px;border-radius:6px;color:var(--sub);font-size:12px;margin-top:13px}
+.panel .canvas{max-width:205px;margin:13px auto}
+.panel .stage{pointer-events:none}
+#status{margin:6px 0;color:var(--sub);font-size:13px}
+body.editing main{margin-right:min(410px,35vw)}
+@media(max-width:900px){body.editing main{margin-right:0}}
+</style></head><body><header class="top"><div class="logo">카드뉴스 편집실</div><span class="muted" id="chosenLabel"></span><span class="spacer"></span><button id="saveProject">편집 프로젝트 저장</button><button id="saveSelected">선택안 HTML 저장</button><button id="exportMedia" class="primary" hidden>선택안 PNG·MP4 저장</button></header><main><h1>시안 선택 및 편집</h1><div class="muted">사진 또는 편집 버튼을 눌러 문구와 크롭을 수정하세요. 여러 시안이 있다면 저장할 본문 스타일을 선택하세요.</div><div id="status" role="status"></div><div id="versions"></div></main><aside id="panel" class="panel" aria-label="슬라이드 편집"><div class="panelhead"><h2 id="editTitle">슬라이드 편집</h2><button id="closePanel">닫기</button></div><div id="bigPreview"></div><div id="fields"></div><div class="notice" id="warning">수정 내용은 즉시 미리보기에 반영됩니다. 편집을 이어가려면 프로젝트 저장 버튼으로 HTML을 저장하세요.</div><button id="resetSlide" style="margin-top:14px">이 슬라이드 원래대로</button></aside><script id="project" type="application/json">__PROJECT__</script><script>
 'use strict';
 const $=s=>document.querySelector(s), project=JSON.parse($('#project').textContent), versions=project.versions;let selected=project.selected||0,active=null;const requested=versions.findIndex(v=>v.id&&'#'+v.id===location.hash);if(requested>=0)selected=requested;const originals=versions.map(v=>v.slides.slice());
 const status=s=>$('#status').textContent=s;new ResizeObserver(()=>document.documentElement.style.setProperty('--top-height',$('.top').offsetHeight+'px')).observe($('.top'));
@@ -31,10 +70,10 @@ function openEditor(v,i){active=[v,i];$('#panel').classList.add('open');document
 $('#closePanel').onclick=()=>{$('#panel').classList.remove('open');document.body.classList.remove('editing');if(panelObserver)panelObserver.disconnect();active=null;};$('#resetSlide').onclick=()=>{if(!active)return;const [v,i]=active;saveSlide(v,i,originals[v][i]);openEditor(v,i);};
 function download(name,content){const url=URL.createObjectURL(new Blob([content],{type:'text/html;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
 function safeJSON(o){return JSON.stringify(o).replace(/</g,'\\u003c');}
-$('#saveProject').onclick=()=>{project.selected=selected;const doc=document.documentElement.cloneNode(true);doc.querySelector('#project').textContent=safeJSON({...project,exportUrl:null});doc.querySelector('#versions').replaceChildren();doc.querySelector('#fields').replaceChildren();doc.querySelector('#bigPreview').replaceChildren();doc.querySelector('#panel').classList.remove('open');doc.querySelector('body').classList.remove('editing');download('jaramsae-editable-project.html','<!doctype html>'+doc.outerHTML);status('편집 프로젝트 HTML을 저장했습니다. 다시 열면 수정 내용을 이어서 편집할 수 있습니다.');};
+$('#saveProject').onclick=()=>{project.selected=selected;const doc=document.documentElement.cloneNode(true);doc.querySelector('#project').textContent=safeJSON({...project,exportUrl:null});doc.querySelector('#versions').replaceChildren();doc.querySelector('#fields').replaceChildren();doc.querySelector('#bigPreview').replaceChildren();doc.querySelector('#panel').classList.remove('open');doc.querySelector('body').classList.remove('editing');download('cardnews-project.html','<!doctype html>'+doc.outerHTML);status('편집 프로젝트 HTML을 저장했습니다. 다시 열면 수정 내용을 이어서 편집할 수 있습니다.');};
 $('#saveSelected').onclick=()=>{
   const v=versions[selected];
-  download('jaramsae-selected-version-'+(selected+1)+'.html','<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>자람새 선택안</title><style>'+v.css+'</style></head><body>'+v.slides.join('')+'</body></html>');
+  download('cardnews-selection-'+(selected+1)+'.html','<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>카드뉴스 선택안</title><style>'+v.css+'</style></head><body>'+v.slides.join('')+'</body></html>');
   status('선택안 HTML을 저장했습니다.');
 };
 const exportButton=$('#exportMedia');

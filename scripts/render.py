@@ -16,6 +16,9 @@ def media_path(src, value, extensions):
         raise ValueError('유효한 로컬 미디어 파일이 필요합니다: ' + value)
     return path
 
+def display_name(data):
+    return data.get('display_name') or data.get('institution','')
+
 def magazine_body(data, post, s, art, sid, page, colors, label, platform, logo, clip):
     variant = data['body_style']
     total = len(post['slides']) + int(data.get('body_only', False))
@@ -25,24 +28,32 @@ def magazine_body(data, post, s, art, sid, page, colors, label, platform, logo, 
         aside = f'<div class="photo-aside">{e(s["aside"])}</div>' if s.get('aside') else ''
         content = f'<div class="art">{art}</div><span class="spark" aria-hidden="true">✦</span>{aside}<div class="mag-copy">{copy}</div>{footer}'
     elif variant == 'interview':
-        issue = e(data.get('issue') or f'{data["institution"]} · 01')
+        issue = e(data.get('issue') or f'{display_name(data)} · 01')
         question = f'<div class="interview-question"><b>Q.</b> <span>{e(s["question"])}</span></div>' if s.get('question') else ''
         quote = f'<blockquote><b>A.</b> <span class="source-quote">{e(s["quote"])}</span></blockquote>' if s.get('quote') else ''
-        content = f'<div class="issue">{issue}</div><div class="section-label">INTERVIEW</div><div class="art">{art}</div><div class="mag-copy">{copy}{question}{quote}</div>{footer}'
+        content = (f'<div class="issue">{issue}</div><div class="section-label">INTERVIEW</div>'
+                   f'<div class="art">{art}</div><div class="mag-copy">{question}{quote}{copy}</div>{footer}')
     else:
         brand = ''
         if variant == 'overlay':
-            identity = f'<img src="{e(logo)}" alt="{e(data["institution"])}">' if logo else f'<span>{e(data["institution"])}</span>'
+            identity = f'<img src="{e(logo)}" alt="{e(display_name(data))}">' if logo else f'<span>{e(display_name(data))}</span>'
             brand = f'<div class="overlay-brand">{identity}</div>'
-        if clip:
-            art += f'<video src="{e(clip)}" preload="metadata" playsinline muted></video>'
-        subtitle = f'<div class="video-subtitle">{e(s.get("subtitle") or s["title"])}</div>' if clip else ''
-        content = f'<div class="art">{art}</div><div class="media-shade"></div>{brand}<div class="mag-copy">{copy}{subtitle}</div>{footer}'
-    return f'<article class="slide magazine-card magazine-{variant} page-{page}" id="{sid}" style="{colors}">{content}</article>'
+        if variant == 'video':
+            if clip:
+                art += f'<video src="{e(clip)}" preload="metadata" playsinline muted></video>'
+            subtitle = f'<div class="video-subtitle">{e(s.get("subtitle") or s["title"])}</div>' if clip else ''
+            content = (f'<div class="mag-copy">{copy}</div><div class="art">{art}</div>'
+                       f'{subtitle}{footer}')
+        else:
+            content = f'<div class="art">{art}</div><div class="media-shade"></div>{brand}<div class="mag-copy">{copy}</div>{footer}'
+    emphasis = ' has-quote' if variant == 'interview' and s.get('quote') else ''
+    return f'<article class="slide magazine-card magazine-{variant} page-{page}{emphasis}" id="{sid}" style="{colors}">{content}</article>'
 
 def build(src,out):
     data=json.loads(src.read_text(encoding='utf-8'))
     validate(data,json.loads((ROOT/'schemas/feed.schema.json').read_text(encoding='utf-8')))
+    if data['style'] == 'bold-photo-editorial' and 'display_name' in data and not data.get('editorial_variant'):
+        data.setdefault('body_style', 'playful')
     if out.exists(): raise ValueError('출력 폴더가 이미 존재합니다. 새 경로를 사용하세요.')
     # Check all image permissions and paths before creating outputs.
     # Bold photo editorial requires a traceable, approved image on every slide.
@@ -134,7 +145,7 @@ def build(src,out):
                 x = s.get('image_focus_x',50)
                 y = s.get('image_focus_y',50)
                 photo = f'<img src="{e(s["image"],quote=True)}" alt="활동 사진" style="object-position:{x}% {y}%;transform:scale({zoom});transform-origin:{x}% {y}%">'
-                blocks.append(f'<article class="slide preset-bold-photo-editorial signature-cover has-image{edition_class}" id="{sid}" style="{colors}"><div class="art">{photo}</div><div class="cover-brand">{e(data["institution"])}</div><div class="cover-copy"><div class="cover-eyebrow">{eyebrow}</div><h1>{lines}</h1></div><div class="cover-credit">출처 | {e(platform)}</div></article>')
+                blocks.append(f'<article class="slide preset-bold-photo-editorial signature-cover has-image{edition_class}" id="{sid}" style="{colors}"><div class="art">{photo}</div><div class="cover-brand">{e(display_name(data))}</div><div class="cover-copy"><div class="cover-eyebrow">{eyebrow}</div><h1>{lines}</h1></div><div class="cover-credit">출처 | {e(platform)}</div></article>')
                 continue
             if data['style']=='bold-photo-editorial':
                 page_num=j+int(data.get('body_only',False))
@@ -154,7 +165,7 @@ def build(src,out):
                     continue
                 blocks.append(f'<article class="slide article-body edition-{variant} page-{page_num} has-image" id="{sid}" style="{colors}"><div class="art">{art}</div><div class="article-copy"><div class="category">{label}</div><h1>{e(s["title"])}</h1><p>{e(s["body"])}</p><footer><span>{page_num:02d} / {page_total:02d}</span><span>출처 | {platform}</span></footer></div></article>')
                 continue
-            blocks.append(f'<article class="slide {s["layout"]} preset-{data["style"]}{has_image}" id="{sid}" style="{colors}"><header><span>{e(data["institution"])}</span>{draft}</header><div class="category">{e(post["category"])}</div><h1>{e(s["title"])}</h1><div class="art">{art}</div><p>{e(s["body"])}</p><div class="details">{details}</div><footer><span> {i:02d} · {e(post["category"])}</span><span>{credit or (str(j).zfill(2)+" / "+str(len(post["slides"])).zfill(2))}</span></footer></article>')
+            blocks.append(f'<article class="slide {s["layout"]} preset-{data["style"]}{has_image}" id="{sid}" style="{colors}"><header><span>{e(display_name(data))}</span>{draft}</header><div class="category">{e(post["category"])}</div><h1>{e(s["title"])}</h1><div class="art">{art}</div><p>{e(s["body"])}</p><div class="details">{details}</div><footer><span> {i:02d} · {e(post["category"])}</span><span>{credit or (str(j).zfill(2)+" / "+str(len(post["slides"])).zfill(2))}</span></footer></article>')
     (edit/'index.html').write_text('<!doctype html><html lang="ko"><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head><body>'+''.join(blocks)+'</body></html>',encoding='utf-8')
     (edit/'feed.json').write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
     (out/'captions.md').write_text('\n'.join(captions),encoding='utf-8')
@@ -166,22 +177,25 @@ def build(src,out):
     (out/'sources.md').write_text('\n'.join(sources)+'\n',encoding='utf-8')
 
 def export_video(slide, clip, output):
+    frame = slide.evaluate("""el=>{
+        const card=el.getBoundingClientRect(), media=el.querySelector('.art').getBoundingClientRect();
+        return [media.width,media.height,media.left-card.left,media.top-card.top].map(Math.round);
+    }""")
     with TemporaryDirectory() as temp:
         layer = Path(temp) / 'layer.png'
-        slide.evaluate("""el=>{
-            el.style.background='transparent';
-            el.querySelector('.art').style.visibility='hidden';
-            document.body.style.background='transparent';
-        }""")
+        frame_mask = slide.page.add_style_tag(content="""
+            body {background:transparent!important}
+            .magazine-video.capture-layer {background:transparent!important}
+            .capture-layer .art {background:transparent!important}
+            .capture-layer .art > * {visibility:hidden!important}
+        """)
+        slide.evaluate("el=>el.classList.add('capture-layer')")
         try:
             slide.screenshot(path=str(layer), animations='disabled', omit_background=True)
         finally:
-            slide.evaluate("""el=>{
-                el.style.removeProperty('background');
-                el.querySelector('.art').style.removeProperty('visibility');
-                document.body.style.removeProperty('background');
-            }""")
-        composite(clip, layer, output)
+            slide.evaluate("el=>el.classList.remove('capture-layer')")
+            frame_mask.evaluate('el=>el.remove()')
+        composite(clip, layer, output, frame)
 
 def magazine_issues(slide):
     return slide.evaluate("""card=>{
@@ -191,6 +205,12 @@ def magazine_issues(slide):
         const footer=card.querySelector('footer').getBoundingClientRect();
         const issues=[];
         if(copy.bottom>footer.top+1)issues.push('본문이 바닥글과 겹칩니다');
+        if(card.classList.contains('magazine-video')){
+            const frame=card.querySelector('.art').getBoundingClientRect();
+            if(copy.bottom>frame.top-20)issues.push('제목이나 본문이 영상 영역과 겹칩니다');
+            const subtitle=card.querySelector('.video-subtitle');
+            if(subtitle && subtitle.getBoundingClientRect().bottom>footer.top-12)issues.push('자막이 바닥글과 겹칩니다');
+        }
         for(const node of card.querySelectorAll('.mag-copy,.issue,.overlay-brand,.photo-aside,.video-subtitle,blockquote')){
             const box=node.getBoundingClientRect();
             if(box.top<bounds.top-1||box.bottom>bounds.bottom+1||box.left<bounds.left-1||box.right>bounds.right+1||node.scrollWidth>node.clientWidth+2)

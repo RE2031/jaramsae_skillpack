@@ -2,7 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "required": [
-    "institution",
     "goal",
     "style",
     "brand",
@@ -252,6 +251,10 @@
     "issue": {
       "type": "string",
       "maxLength": 30
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "allOf": [
@@ -310,6 +313,18 @@
           }
         }
       }
+    }
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "display_name"
+      ]
+    },
+    {
+      "required": [
+        "institution"
+      ]
     }
   ]
 }

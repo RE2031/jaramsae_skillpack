@@ -2,8 +2,8 @@
 
 ## 입력과 기본 흐름
 
-- 표시 이름과 이번 게시물 주제, 표지 사진 1장과 본문용 사진 3장, 카드별 제목·원고를 준비한다. 기존 프로필의 기관명은 표시 이름 기본값으로 쓰고, 화면에서 직접 입력한 값을 우선한다. 프로필 없이도 시작할 수 있다.
-- 사진마다 실제 제공 자료인지 예시 이미지인지 표시한다. 사용 권한과 필요 시 인물 공개 동의를 확인한다. 실제 아동 사진은 보호자 동의, 기관 공개 권한, 외부 AI 전송 권한이 모두 확인된 범위에서 사용한다.
+- 표시 이름과 이번 게시물 주제, 표지 사진 1장과 본문용 사진 3장, 카드별 제목·원고를 준비한다. 표시 이름과 주제는 스튜디오에서 매 게시물에 직접 입력한다.
+- 사진마다 실제 제공 자료인지 예시 이미지인지 표시한다. 사용 권한과 필요 시 인물 공개 동의를 확인한다. 업로드한 자료의 공개와 재사용 권한을 확인한다.
 - 사진은 같은 게시물의 네 스타일에서 공유한다. 선택한 스타일의 입력만 화면에 드러나며 다른 스타일에 입력한 자료도 유지된다. 본문은 인물·주제 소개, 핵심 장면, 결론이나 후속 질문으로 전개할 수 있다.
 
 ## 공통 표지
@@ -16,28 +16,28 @@
 | --- | --- |
 | A · 아기자기 편집형 | 사진 속 물건과 짧은 문구가 주고받는 듯한 말풍선, 작은 삽화나 스티커를 사용한다. 말풍선은 `aside`에 넣는다. |
 | B · 사진 오버레이형 | 풀블리드 정지 사진 위에 제목·짧은 본문을 배치한다. 모든 본문 카드의 같은 상단 위치에 사용자 로고(`logo`)를 둔다. 로고가 없으면 표시 이름을 쓴다. |
-| C · 영상 매거진형 | 필요한 본문 카드에 한 편의 짧은 영상(`video`, 최대 30초)과 화면 문구·자막(`subtitle`)을 붙인다. 앞뒤 정지 카드가 배경과 결론을 전한다. 사진은 영상 유무와 관계없이 정지 미리보기로 쓰인다. 자막은 영상 전체에 보여주는 한 문구이며 MP4 화면에 합성된다. 자막을 비우면 카드 제목을 쓴다. |
-| D · 인터뷰 지면형 | 작은 발행호(`issue`), INTERVIEW 라벨, 질문(`question`)과 큰 직접 인용(`quote`)을 조합한다. 인물·맥락 → 기억에 남는 답변 → 후속 질문이나 마무리. 인용은 `interview_source`의 연속된 문장을 그대로 쓴다. 원문이 없으면 간접 요약을 본문에 쓴다. |
+| C · 영상 매거진형 | 필요한 본문 카드에 한 편의 짧은 영상(`video`, 최대 30초)과 화면 문구·자막(`subtitle`)을 붙인다. 앞뒤 정지 카드가 배경과 결론을 전한다. 사진은 영상 유무와 관계없이 가로 16:9 미디어 창의 정지 미리보기로 쓰인다. 자막은 영상 전체에 보여주는 한 문구이며 MP4 화면에 합성된다. 자막을 비우면 카드 제목을 쓴다. |
+| D · 인터뷰 지면형 | 작은 발행호(`issue`), INTERVIEW 마스트헤드, 질문(`question`)과 지면에서 가장 크게 보이는 직접 인용(`quote`)을 조합한다. 인물·맥락 → 기억에 남는 답변 → 후속 질문이나 마무리. 인용은 `interview_source`의 연속된 문장을 그대로 쓴다. 원문이 없으면 간접 요약을 본문에 쓴다. |
 
 레퍼런스에서는 편집 방식만 참고한다. 로고, 사진, 사실과 카피는 사용자 브랜드와 제공 자료를 바탕으로 제작한다. 모든 텍스트는 HTML/CSS 레이어에 넣는다.
 
 ## feed.json과 기존 데이터
 
-`schemas/feed.schema.json`을 따른다. 표시 이름은 기존 필드 `institution`에 저장한다. 새 카드뉴스의 `style`은 `bold-photo-editorial`이고, 선택한 본문형은 `body_style`의 `playful`, `overlay`, `video`, `interview`로 표시한다. `make_editions.py`는 하나의 입력을 재사용해 요청된 본문형을 지정한다.
+`schemas/feed.schema.json`을 따른다. 새 피드에서 표시 이름은 `display_name`에 저장한다. 새 카드뉴스의 `style`은 `bold-photo-editorial`이고, 선택한 본문형은 `body_style`의 `playful`, `overlay`, `video`, `interview`로 표시한다. `make_editions.py`는 하나의 입력을 재사용해 요청된 본문형을 지정한다.
 
 - 표지는 `image`, `image_zoom`, `image_focus_x`, `image_focus_y`, `eyebrow`, `title`과 빈 `body`를 쓴다.
 - 본문은 `title`, `body`, `layout`, `image`를 쓴다. 스타일별 필드는 위 표를 따른다.
-- `image`, `logo`, `video`는 feed.json 기준 상대 경로다. 승인된 사진에 `image_approved: true`, 사진 유형에 `image_kind`, 표기에 `image_source`와 `image_credit`를 쓴다. 새 유형 `provided`는 일반 사용자 제공 자료에 적용한다. 저장된 `institution` 사진 유형과 기존 `editorial_variant` 피드는 단일 파이프라인에서 기존 규칙으로 렌더링된다.
+- `image`, `logo`, `video`는 feed.json 기준 상대 경로다. 승인된 사진에 `image_approved: true`, 사진 유형에 `image_kind`, 표기에 `image_source`와 `image_credit`를 쓴다. 새 유형 `provided`는 일반 사용자 제공 자료에 적용한다. 보관된 이전 JSON의 `institution`, 사진 유형과 `editorial_variant`도 단일 파이프라인에서 읽는다.
 
 ## 실행과 검수
 
 ```powershell
 python -m pip install -r requirements.txt
 python -m playwright install chromium
-python -X utf8 app/server.py --port 8765
+python -X utf8 app/server.py --port 8772
 ```
 
-`http://127.0.0.1:8765/`에서 자료를 한 번 입력한 후 **선택한 스타일 만들기** 또는 **4종 비교하기**를 누른다. 결과의 **편집·저장**에서 문구를 수정하고 **선택안 PNG·MP4 저장**을 누른다. 정지 카드는 PNG, 영상 카드는 자막을 합성한 MP4로 저장한다. 파일명 앞의 장 번호가 원래 순서를 나타낸다.
+`http://127.0.0.1:8772/`에서 자료를 한 번 입력한 후 **선택한 스타일 만들기** 또는 **4종 비교하기**를 누른다. 결과의 **편집·저장**에서 문구를 수정하고 **선택안 PNG·MP4 저장**을 누른다. 정지 카드는 PNG, 영상 카드는 자막을 합성한 MP4로 저장한다. 파일명 앞의 장 번호가 원래 순서를 나타낸다.
 
 ```powershell
 python -X utf8 scripts/make_editions.py output/work/feed.json --out output/four-editions

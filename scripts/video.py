@@ -16,13 +16,17 @@ def ffmpeg(*args):
 
 def prepare(source, output):
     ffmpeg('-i', source, '-map', '0:v:0', '-map', '0:a:0?', '-t', '30',
-           '-vf', 'scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,setsar=1',
+           '-vf', "scale='min(1080,iw)':'min(1350,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2,setsar=1",
            '-r', '30', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'fast',
            '-c:a', 'aac', '-movflags', '+faststart', output)
 
 
-def composite(source, layer, output):
+def composite(source, layer, output, frame):
+    width, height, left, top = frame
+    framing = (f'[0:v]scale={width}:{height}:force_original_aspect_ratio=increase,'
+               f'crop={width}:{height},setsar=1,pad=1080:1350:{left}:{top}:color=0x161b24[clip];'
+               '[clip][1:v]overlay=format=auto[v]')
     ffmpeg('-i', source, '-i', layer, '-filter_complex',
-           '[0:v]scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,setsar=1[clip];[clip][1:v]overlay=format=auto[v]',
+           framing,
            '-map', '[v]', '-map', '0:a:0?', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
            '-preset', 'fast', '-c:a', 'aac', '-movflags', '+faststart', output)

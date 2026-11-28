@@ -142,47 +142,64 @@
 /* Plain institution name: no generated logo or extra mark. */
 .signature-cover .cover-brand::before,.signature-cover .cover-brand::after{content:none!important;display:none!important}
 
-.magazine-card{padding:54px 64px 44px;gap:0}
-.magazine-card h1{font-size:72px;line-height:1.17;letter-spacing:-3px}
-.magazine-card p{font-size:40px;line-height:1.42}
-.magazine-card .category{font-size:29px;letter-spacing:0;margin-bottom:12px}
-.magazine-card .mag-copy{display:grid;gap:15px}
+/* The four body styles share the card dimensions and source line. */
+.magazine-card{padding:58px 66px 42px;gap:0}
+.magazine-card h1{font-size:72px;line-height:1.14;letter-spacing:-3.2px}
+.magazine-card p{font-size:38px;line-height:1.42}
+.magazine-card .category{font-size:27px;letter-spacing:0}
+.magazine-card .mag-copy{display:grid;gap:17px}
 .magazine-card footer{width:100%;font-size:25px;padding-top:14px}
 .magazine-card footer span:last-child{font-size:23px}
 
-.magazine-playful{background:#fff1d9;color:#2c2330}
-.magazine-playful .art{margin:20px 20px 24px;height:685px;border:12px solid #fffdf8;border-radius:70px 70px 100px 70px;background:#f4caad;box-shadow:9px 13px 0 #dab5c9;transform:rotate(-1.7deg)}
-.magazine-playful .mag-copy{margin:26px 14px 0}
-.magazine-playful .category{justify-self:start;margin:0;background:#f5c856;border-radius:38px;padding:10px 24px;font-weight:850}
-.magazine-playful .spark{position:absolute;top:45px;left:46px;font-size:92px;color:#f5c856;-webkit-text-stroke:2px #422b36;line-height:1}
-.magazine-playful .photo-aside{position:absolute;right:53px;top:590px;max-width:520px;padding:20px 31px;border:4px solid #4c3547;border-radius:46px 46px 10px 46px;background:#ffe6f1;font-size:34px;font-weight:800;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-playful{background:#fcf7e9;color:#292224}
+.magazine-playful .art{height:652px;margin:36px 24px 33px 8px;border:10px solid #fffdf8;border-radius:33px;box-shadow:8px 12px 0 #292224;transform:rotate(-2deg)}
+.magazine-playful .mag-copy{margin:21px 26px 0}
+.magazine-playful .category{justify-self:start;border:3px solid currentColor;background:#ffc657;border-radius:30px;padding:7px 22px;font-weight:880;transform:rotate(-3deg)}
+.magazine-playful h1{font-weight:950}
+.magazine-playful .spark{position:absolute;top:46px;left:35px;transform:rotate(12deg);font-size:133px;color:#ffd061;-webkit-text-stroke:3px #292224;line-height:1}
+.magazine-playful .photo-aside{position:absolute;right:50px;top:592px;max-width:560px;padding:19px 31px;border:4px solid #292224;border-radius:40px;background:#fff;box-shadow:7px 8px 0 #f393ad;font-size:38px;font-weight:850;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-playful .photo-aside:before{content:"";position:absolute;left:29px;top:-19px;width:27px;height:27px;transform:skew(-17deg) rotate(45deg);background:#fff;border:solid #292224;border-width:4px 0 0 4px}
+.magazine-playful footer{border-top:2px dashed #29222467}
 
-.magazine-overlay,.magazine-video{isolation:isolate;color:white;background:#14171a}
-.magazine-overlay .art,.magazine-video .art{position:absolute;inset:0;height:100%;border-radius:0;z-index:-2;background:#14171a}
+.magazine-overlay{isolation:isolate;color:white;background:#14171a}
+.magazine-overlay .art{position:absolute;inset:0;height:100%;border-radius:0;z-index:-2;background:#14171a}
+.magazine-overlay .media-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#05080db8,transparent 20%,transparent 35%,#05080dd9 77%,#04080cf5)}
+.magazine-overlay .mag-copy{margin-top:auto;max-width:875px}
+.magazine-overlay h1{font-size:88px;line-height:1.08}
+.magazine-overlay .category{font-weight:600}
+.magazine-overlay footer{margin-top:44px;color:#f6f6f6;border-top:1px solid #ffffff55}
+.overlay-brand{position:absolute;top:56px;left:66px;width:320px;height:106px;display:flex;align-items:center;justify-content:flex-start}
+.overlay-brand img{max-width:100%;max-height:100%;object-fit:contain;object-position:left center}
+.overlay-brand span{font-size:39px;font-weight:900;overflow-wrap:anywhere;text-shadow:0 2px 8px #000}
+
+.magazine-video{padding:64px 66px 43px;color:#fbfbf4;background:#161b24}
+.magazine-video .mag-copy{gap:13px}
+.magazine-video .category{color:#c6ed77}
+.magazine-video h1{font-size:71px;line-height:1.12}
+.magazine-video p{font-size:35px}
+.magazine-video .art{position:absolute;left:0;top:450px;width:1080px;height:608px;background:#0a0d12;border-radius:0}
 .magazine-card video{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .magazine-card.is-playing video{display:block}
-.magazine-card .media-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#050a10aa,transparent 22%,transparent 34%,#050a10d9 72%,#050a10fc)}
-.magazine-overlay .mag-copy,.magazine-video .mag-copy{margin-top:auto}
-.magazine-overlay footer,.magazine-video footer{margin-top:28px;color:#f1f1f1}
-.overlay-brand{position:absolute;top:54px;left:64px;width:320px;height:110px;display:flex;align-items:center;justify-content:flex-start}
-.overlay-brand img{max-width:100%;max-height:100%;object-fit:contain;object-position:left center}
-.overlay-brand span{font-size:40px;font-weight:850;overflow-wrap:anywhere;text-shadow:0 2px 8px #000}
-.magazine-video .category{color:#caf2ee}
-.magazine-video .media-shade{background:linear-gradient(180deg,#08262980,transparent 24%,transparent 34%,#092528d9 68%,#092528 92%)}
-.magazine-video .media-shade:after{content:"";position:absolute;inset:42px 48px auto;height:560px;border-top:5px solid #caf2ee;border-left:5px solid #caf2ee;border-right:5px solid #caf2ee;mask-image:linear-gradient(black 0 12%,transparent 37%)}
-.magazine-video .mag-copy{padding:32px 0 16px;border-top:5px solid #caf2ee}
-.magazine-video .video-subtitle{max-width:100%;justify-self:center;background:#caf2ee;border-radius:10px;padding:14px 28px;color:#11292b;font-size:38px;font-weight:750;line-height:1.35;text-align:center;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-video .video-subtitle{position:absolute;top:970px;left:66px;right:66px;padding:15px 25px;border-left:6px solid #c6ed77;background:#252d39;color:white;font-size:38px;font-weight:750;line-height:1.38;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-video footer{color:#e4e9dd;border-top:2px solid #444c56}
+.magazine-video.capture-layer::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#161b24 0 450px,transparent 450px 1058px,#161b24 1058px);z-index:-1}
+.magazine-video.capture-layer{isolation:isolate}
 
-.magazine-interview{background:#f7f3e9;color:#27221c}
-.magazine-interview .issue{font:700 28px/1.2 Georgia,"Batang",serif;padding-bottom:16px;border-bottom:2px solid currentColor}
-.magazine-interview .section-label{font:700 40px/1.2 Georgia,serif;letter-spacing:4px;margin:17px 0 22px;color:#8d382f}
-.magazine-interview .art{height:420px;border-radius:0;margin-bottom:25px}
-.magazine-interview h1{font-family:Georgia,"Batang",serif;font-size:64px}
+.magazine-interview{background:#fbf8f0;color:#201b17}
+.magazine-interview .issue{font:700 28px/1.2 Georgia,"Batang",serif;padding-bottom:14px;border-bottom:3px solid currentColor}
+.magazine-interview .section-label{font:700 78px/.98 Georgia,serif;letter-spacing:-3px;margin:15px 0 26px}
+.magazine-interview .art{height:485px;border-radius:0;margin-bottom:29px}
+.magazine-interview h1{font-family:Georgia,"Batang",serif;font-size:78px}
 .magazine-interview p{font-size:36px}
-.magazine-interview .interview-question{font-size:34px;white-space:pre-wrap;overflow-wrap:anywhere}
-.magazine-interview blockquote{margin:0;padding:13px 0 0 21px;border-left:5px solid #8d382f;font:700 46px/1.28 Georgia,"Batang",serif;white-space:pre-wrap;overflow-wrap:anywhere}
-.magazine-interview blockquote b{color:#8d382f;font-size:30px}
+.magazine-interview .category,.magazine-interview .interview-question b{color:#952f27}
+.magazine-interview .interview-question{font-size:36px;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-interview blockquote{margin:0 0 5px;padding:10px 0 15px;border-bottom:2px solid #952f27;font:700 62px/1.2 Georgia,"Batang",serif;letter-spacing:-2px;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-interview blockquote b{color:#952f27;font-size:32px}
+.magazine-interview.has-quote .art{height:276px}
+.magazine-interview.has-quote h1{font-size:47px}
+.magazine-interview.has-quote p{font-size:33px}
 .magazine-interview footer{border-top:2px solid currentColor}
+.photo-aside,.video-subtitle,.interview-question,.magazine-interview blockquote{word-break:keep-all}
 /* Approved article body: top photo, bottom paper, no text overlay. */
 .slide.article-body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:775px minmax(0,1fr);gap:0;padding:0;background:#faf5ee;color:#503020}
 .slide.article-body .art{width:100%;height:100%;min-height:0;border-radius:0;overflow:hidden}
