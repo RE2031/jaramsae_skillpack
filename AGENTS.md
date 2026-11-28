@@ -1,43 +1,47 @@
-# 작업 지침
-기관 전용 한국어 인스타그램 제작 요청에는 `skills/instagram-feed-creator/SKILL.md`를 먼저 읽는다. 하위 스킬과 `references/design-rules.md`, `schemas/feed.schema.json`을 따른다. 실제 기관 정보와 공개 허가 사진만 사용하고 불명확한 사실은 초안으로 표시한다. 사용자 승인 전 자동 게시 금지. 결과물 생성 후 렌더링 결과를 확인하고 검수 결과를 보고한다.
+# 작업 지침 — 토큰 최소 경로
 
-## 기관 최초 설정 및 재사용
-기관별 프로필이 없는 경우 `skills/institution-onboarding/SKILL.md` 및 `prompts/onboarding.md`를 읽는다. 최초 설정은 여섯 가지 질문으로 진행하며 이미 제공된 정보는 다시 묻지 않는다. 기관 프로필은 `schemas/brand-profile.schema.json`을 따르고, 가상 예시는 `examples/brand-profile.json`을 참고한다. 실제 기관 프로필은 비공개 기관별 저장소에만 보관하고 Git에 올리지 않는다. 저장 환경이 없으면 미저장이라고 보고한다. 즉시 제작 요청의 경우 필요한 정보만 확인하고 선택 항목을 이유로 작업을 막지 않는다. 기존 v0.7 Signature Cover와 렌더링 절차를 유지한다.
+기관 인스타그램 제작 요청의 **기본 경로는 `references/quick-spec.md` 한 장**이다. 그것만 읽고 실행한다.
+아래 "더 읽기"에 해당할 때만 그 파일을 추가로 연다. 규칙을 이미 알고 있으면 다시 읽지 않는다.
 
-## 기본 스타일 v0.6
-별도 요청이 없으면 `bold-photo-editorial`을 기본값으로 사용한다. 풀블리드 사진, 상단 중앙의 작은 기관명, 하단의 어두운 그라데이션, 작은 도입 문구, 크고 굵은 흰색 제목, 작은 출처 표기를 사용한다. 첫 장에는 보조 문구를 넣지 않는다. 사진은 약 75%, 텍스트는 약 25%의 시각적 비중을 출발점으로 한다. 모든 슬라이드에 승인된 사진이 필요하며 사진 안에 생성된 글자나 로고를 사용하지 않고 HTML/CSS 텍스트 레이어를 사용한다. 상세 기준은 `references/styles/bold-photo-editorial.json`을 따른다. 정보 중심 요청에는 `editorial-hybrid` 또는 `minimal-information`을 사용할 수 있다.
+## 반드시 지킬 것
+1. 실제 기관 정보와 사용 승인 사진만 사용한다. 불명확한 사실은 초안으로 표시하거나 한 번만 질문한다.
+2. 기관명은 원장이 입력한 표기를 그대로 쓴다. 로고·아이콘·이모지·워터마크·장식 도형을 넣지 않는다.
+3. 표지 제목은 정확히 2줄(`\n` 하나), `body`는 빈 문자열. 넘치면 글자를 줄이지 말고 카피를 다시 쓴다.
+4. 사진 안에 글자를 생성하지 않는다. 모든 텍스트는 HTML/CSS 레이어로 렌더링한다.
+5. `python scripts/make_editions.py`(4시안) 또는 `python scripts/pipeline.py`(단일)를 **실제로 실행**한다. 실행하지 않았거나 실패했으면 완료라고 말하지 않는다.
+6. Windows에서 cp1252 인코딩 오류(`UnicodeEncodeError`)가 보이면 `export PYTHONIOENCODING=utf-8`을 붙인다.
+7. 스톡·AI 사진을 실제 원아 사진으로 오인시키지 않는다. 실제 아동 사진은 보호자 동의·기관 공개 권한·외부 AI 전송 권한을 확인한다. 캡션과 출처에 표시한다.
+8. 자동 게시 금지. 게시 승인은 사람이 한다.
+9. 실제 기관 프로필·사진·결과물은 Git에 커밋하지 않는다(`profiles/`, `output/`는 gitignore).
+10. 결과물을 만든 뒤 렌더 결과와 검수 상태를 함께 보고한다.
+11. 이미 답한 정보는 다시 묻지 않는다. 프로필을 저장할 수 없는 환경이면 미저장이라고 보고한다.
+12. 즉시 제작 요청이면 필요한 정보만 확인하고, 선택 항목이 없다는 이유로 작업을 막지 않는다.
+13. 실행 순서: style-direction → visual-curation → editorial-copywriting → post-composition → anti-ai-aesthetic → 렌더 → visual-critique. 게시물 수를 9개로 강제하지 않는다.
 
-## 실행 순서
-style-direction → visual-curation → editorial-copywriting → post-composition → anti-ai-aesthetic → 렌더 → visual-critique 순서. 단일 게시물을 9개로 강제하지 않는다.
+## 기본 흐름
+1. `references/quick-spec.md`를 읽는다.
+2. 사진은 `output/work-<작업명>/photos/`에 두고 `feed.json`을 같은 폴더에 만든다.
+3. `python scripts/make_editions.py output/work-<작업명>/feed.json --out output/four-editions-<작업명>` 실행.
+4. 종료 코드 0, PNG 1080×1350, `quality_check` `passed: true`, `editor.html` 존재를 확인한다.
+5. 결과 경로·사진 출처·검수 상태를 보고한다.
 
-## 실행 필수 조건
-콘텐츠 제작 후 반드시 `skills/pipeline-execution/SKILL.md`를 읽고 실행한다. 터미널 도구가 있으면 `python scripts/pipeline.py INPUT.json --out output/고유명`을 실제 실행한다. 실행하지 않았거나 실패했다면 HTML/PNG 생성 완료라고 말하지 않는다. 파이프라인 성공 후 quality_check 결과와 파일을 확인한다.
+## 더 읽기 (해당할 때만)
+| 상황 | 파일 |
+|---|---|
+| 4시안 레퍼런스·디자인 근거 | `references/magazine-editions.md` |
+| 표지 확대·초점·예외 | `references/signature-cover.md` |
+| 본문 디자인 수치 | `references/magazine-body.md` |
+| 최초 기관 설정(6문항) | `skills/institution-onboarding/SKILL.md`, `prompts/onboarding.md` |
+| 카피 톤·문장 길이 | `skills/editorial-copywriting/SKILL.md` |
+| 편집기 전달·선택 PNG | `skills/editor-delivery/SKILL.md` |
+| 실행·검수 규칙 상세 | `skills/pipeline-execution/SKILL.md` |
+| 전체 실행 순서·검수 기준 | `skills/instagram-feed-creator/SKILL.md` |
+| 스타일 프리셋 | `references/styles/*.json` |
 
-## 이미지와 권한
-기본 `bold-photo-editorial`은 모든 슬라이드에 승인된 사진을 요구한다. 실제 아동 사진은 보호자 동의와 기관의 공개 권한 및 외부 AI 전송 권한을 확인한다. AI/스톡 이미지는 실제 원아/기관 사진인 것처럼 표현하지 않는다. 이미지 생성은 글자/로고 없이 수행하고, 텍스트는 HTML/CSS로 렌더링한다.
+## 토큰 원칙
+- 같은 규칙을 여러 파일에 복사하지 않는다. 규칙은 `references/`와 `quick-spec.md`에만 두고, 스킬 파일은 포인터만 둔다.
+- 새 규칙은 `references/quick-spec.md`에 먼저 반영한다.
+- 문서를 읽을 때는 필요한 절만 읽는다(전체 파일 통독 금지).
 
-## v0.7 Signature Cover — 사용자 승인 표지
-기본 bold-photo-editorial의 각 게시물 첫 장(단일 게시물 포함)에 필수 적용한다. 기존 다른 스타일과 2장 이후의 정보형 레이아웃은 유지한다.
-- 1080×1350, 4:5. 사진을 화면 끝까지 채운다. 흐린 좌우 확장 배경, contain, 사진 축소 금지.
-- 상단 중앙에는 원장님이 입력한 institution을 그대로 표시한다. 임의 기관명 및 모든 추가 로고·아이콘·심볼 금지.
-- 아이의 얼굴·손·활동 소재(블록 등)가 크게 보이도록 원본을 확대하고 초점을 조정한다. 배경 가구보다 활동이 중심이다. 필요한 경우 원본 사진을 다시 고르거나 크롭한다. 얼굴이나 손·소재를 가리지 않도록 검수한다.
-- 하단에는 활동을 나타내는 작은 얇은 도입 문구 1줄(eyebrow, 예: 오늘의 놀이 기록, 오늘의 교육 활동)과 굵은 흰색 제목 정확히 2줄만 배치한다. title에 명시적 줄바꿈 하나를 넣는다. 넘치면 문구를 다시 쓰고 글씨를 작게 줄이지 않는다.
-- 표지 body는 빈 문자열, details는 비워 둔다. 설명은 다음 장 또는 caption에 넣는다. 제목 아래 설명·슬라이드 번호·분류 반복 금지.
-- 우측 하단은 출처 | Pexels처럼 실제 출처만 작게 표시한다. stock의 image_source에는 실제 플랫폼명을, image_credit에는 상세 출처/저작자 정보를 기록한다. 생성 사진은 출처 | AI 생성으로 명시한다. 기관 제공 사진은 실제 출처에 맞게 표시한다.
-- 스톡 사진을 실제 원아나 활동 기록처럼 오인시키지 않도록 caption에 대체 사진임을 명시하고 사용 권한을 검증한다. Pinterest는 원본 권리 확인 없이 사용하지 않는다. 생성/스톡 표시 및 게시 승인 상태는 표지의 추가 본문이 아니라 캡션·검수 보고서에 기록한다.
-- 하단 그라데이션을 제한해 얼굴과 활동을 밝고 선명하게 유지한다. PNG를 실제로 열어 아이와 소재가 충분히 큰지 확인한다.
-- image_zoom(1~3), image_focus_x/y(0~100)를 필요에 맞게 조정할 수 있다. 기본 확대 1.15, 중심 초점 50/50은 출발값이며 사진마다 수정한다.
-
-
-## 편집형 HTML 및 시안 선택
-기본 게시물은 4장짜리 시안 4개를 각각 렌더링하고 `skills/editor-delivery/SKILL.md`를 읽어 편집 가능한 독립형 editor.html을 생성·검수한다. 원장님에게는 3×3 피드 대신 각 시안 4장씩 한 줄로 표시하는 편집기를 우선 전달한다. 명시적으로 표지 1장 또는 다른 수량을 요청하면 우선한다. Signature Cover와 권한 및 검수 절차를 유지하고 본문은 최신 기사형 지침을 따른다. 선택안 PNG는 편집 후 별도로 재렌더링한다.
-
-## TIO 우선 매거진 시안 — 최신 우선 지침
-`references/magazine-editions.md`를 먼저 읽는다. TIO(@tio_korea)는 표지 최우선 레퍼런스이며 기존 승인 Signature Cover는 A에 그대로 보존한다. MMM, Eyesmag, 생매거진, Our Expresso는 시안별 보조 레퍼런스다. B/C/D도 풀블리드, 상단 중앙 기관명, 하단 얇은 도입 문구, 정확히 두 줄 굵은 흰색 제목, 우측 하단 출처, 표지 본문 없음이라는 TIO 기반 구조를 유지하면서 타이포/명암/여백을 변주한다. 네 시안에서 사진·활동 사실·카피·브랜드는 동일하게 유지하고 실제 CSS 배치·서체·사진 영역을 다르게 한다. 본문은 승인된 사진 위·글 아래 기사형 구조를 기본으로 한다. 네 시안은 각 4장 한 줄, 총 16장 편집기로 제공한다. 단일 표지 요청에는 A를 기본으로 한다. 원본 권리 확인 및 실제 파이프라인 검수는 기존 규칙을 유지한다.
-
-
-## 최신 필수 규칙: 로고 없는 기관명 · 기사형 본문
-이 지침은 이전 로고 허용 및 본문 후보 지침보다 우선한다.
-- 표지 상단 중앙에는 원장님이 입력한 기관명 문자열 그대로 흰색 굵은 HTML 텍스트만 배치한다. 기관 로고, AI 생성 로고, 아이콘, 심볼, 이모지, 워터마크, 이름 옆 장식 도형은 일절 추가하지 않는다. 기관이 로고 파일을 제공하더라도 이 게시물에는 삽입하지 않는다.
-- 기존 TIO 표지 디자인을 유지한다. 놀이 기록 본문 2~4장은 `references/magazine-body.md`의 사진 위·글 아래 기사형 구조를 기본값으로 한다. 네 시안에서 활동 사실, 사진, 카피는 동일하게 두고 실제 디자인을 변주한다.
-- 이미지 생성 도구는 글자가 없는 사진 소재에만 사용한다. 실제 HTML/CSS 파이프라인을 실행하고 편집 가능한 HTML과 PNG를 확인하기 전 완료로 처리하지 않는다. 네 시안×4장의 기본 편집기와 권한 검수 규칙은 유지한다.
+## 부속 도구
+- `app/server.py` — 로컬 스튜디오(사진 4칸 + 설명 → 4시안 렌더, 시안 PNG 저장). `python app/server.py --port 8765`.

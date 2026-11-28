@@ -24,9 +24,6 @@ python scripts/make_editions.py path/to/feed.json --out output/four-editions
 ```
 Runs the existing pipeline for A–D and combines them into editor.html. Use the existing local editing, selection, and PNG export features. Inspect all 16 rendered PNGs and compare each row at mobile size. If a title overflows, shorten the common headline for all editions or adjust the draft layout; never hide required facts. Publication approval remains manual.
 
-
-## 최신 필수 규칙: 로고 없는 기관명 · 기사형 본문
-이 지침은 이전 로고 허용 및 본문 후보 지침보다 우선한다.
-- 표지 상단 중앙에는 원장님이 입력한 기관명 문자열 그대로 흰색 굵은 HTML 텍스트만 배치한다. 기관 로고, AI 생성 로고, 아이콘, 심볼, 이모지, 워터마크, 이름 옆 장식 도형은 일절 추가하지 않는다. 기관이 로고 파일을 제공하더라도 이 게시물에는 삽입하지 않는다.
-- 기존 TIO 표지 디자인을 유지한다. 놀이 기록 본문 2~4장은 `references/magazine-body.md`의 사진 위·글 아래 기사형 구조를 기본값으로 한다. 네 시안에서 활동 사실, 사진, 카피는 동일하게 두고 실제 디자인을 변주한다.
-- 이미지 생성 도구는 글자가 없는 사진 소재에만 사용한다. 실제 HTML/CSS 파이프라인을 실행하고 편집 가능한 HTML과 PNG를 확인하기 전 완료로 처리하지 않는다. 네 시안×4장의 기본 편집기와 권한 검수 규칙은 유지한다.
+## 필수 규칙
+표지·본문·카피 계약은 `references/quick-spec.md`를 따른다.
+4시안 레퍼런스와 디자인 근거는 `references/magazine-editions.md`를 따른다.

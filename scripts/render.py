@@ -3,6 +3,9 @@ from pathlib import Path
 from jsonschema import validate
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, 'reconfigure'):
+        _stream.reconfigure(encoding='utf-8', errors='replace')
 e=html.escape
 
 def build(src,out):

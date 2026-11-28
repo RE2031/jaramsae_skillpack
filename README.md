@@ -1,4 +1,6 @@
 # Instagram Feed Skill Pack v0.8
+AI 에이전트는 `AGENTS.md` → `references/quick-spec.md` 한 장으로 시작하면 된다(전체 문서를 읽지 않아도 된다).
+
 한국어 보육기관 인스타그램 피드 제작용 Agent Skills + 렌더러. 원장의 자연어 요청을 받은 AI 에이전트가 콘텐츠 JSON을 작성하고, 로컬 렌더러가 편집 가능한 HTML/CSS와 PNG를 생성한다. 자체 서비스 홍보 및 자동 게시 기능은 범위 밖이다.
 
 ## 빠른 시작
@@ -93,18 +95,12 @@ python scripts/pipeline.py examples/editorial-single.json --out output/editorial
 ```
 
 
-## 편집형 HTML 및 시안 선택
-기본 4장 캐러셀은 시안 4개를 생성하고 `skills/editor-delivery/SKILL.md`에 따라 독립형 편집기 HTML을 만든다. 예: `python scripts/build_editor.py output/A output/B output/C output/D --out output/editor.html`. 선택한 시안을 저장하고 `python scripts/export_editor_selection.py selected.html --out output/selected-png`으로 PNG 4장을 다시 만든다. 기존 표지와 렌더링 파이프라인은 유지한다. 편집 데이터는 로컬 HTML에 저장되며 클라우드 저장이나 브라우저 직접 PNG 다운로드는 아직 지원하지 않는다.
-
-## TIO 우선 매거진 시안 — 최신 우선 지침
-`references/magazine-editions.md`를 먼저 읽는다. TIO(@tio_korea)는 표지 최우선 레퍼런스이며 기존 승인 Signature Cover는 A에 그대로 보존한다. MMM, Eyesmag, 생매거진, Our Expresso는 시안별 보조 레퍼런스다. B/C/D도 풀블리드, 상단 중앙 기관명, 하단 얇은 도입 문구, 정확히 두 줄 굵은 흰색 제목, 우측 하단 출처, 표지 본문 없음이라는 TIO 기반 구조를 유지하면서 타이포/명암/여백을 변주한다. 네 시안에서 사진·활동 사실·카피·브랜드는 동일하게 유지하고 실제 CSS 배치·서체·사진 영역을 다르게 한다. 본문은 승인된 사진 위·글 아래 기사형 구조를 기본으로 한다. 네 시안은 각 4장 한 줄, 총 16장 편집기로 제공한다. 단일 표지 요청에는 A를 기본으로 한다. 원본 권리 확인 및 실제 파이프라인 검수는 기존 규칙을 유지한다.
-
 ### 네 가지 실제 디자인 일괄 출력
 `python scripts/make_editions.py INPUT.json --out output/four-editions` — 동일한 4장 콘텐츠를 A/B/C/D로 렌더링하고 editor.html을 생성한다. 본문은 기사형 공통 구조를 사용한다.
 
+## 편집형 HTML 및 시안 선택
+기본 4장 캐러셀은 시안 4개를 생성하고 `skills/editor-delivery/SKILL.md`에 따라 독립형 편집기 HTML을 만든다. 예: `python scripts/build_editor.py output/A output/B output/C output/D --out output/editor.html`. 선택한 시안을 저장하고 `python scripts/export_editor_selection.py selected.html --out output/selected-png`으로 PNG 4장을 다시 만든다. 기존 표지와 렌더링 파이프라인은 유지한다. 편집 데이터는 로컬 HTML에 저장되며 클라우드 저장이나 브라우저 직접 PNG 다운로드는 아직 지원하지 않는다.
 
-## 최신 필수 규칙: 로고 없는 기관명 · 기사형 본문
-이 지침은 이전 로고 허용 및 본문 후보 지침보다 우선한다.
-- 표지 상단 중앙에는 원장님이 입력한 기관명 문자열 그대로 흰색 굵은 HTML 텍스트만 배치한다. 기관 로고, AI 생성 로고, 아이콘, 심볼, 이모지, 워터마크, 이름 옆 장식 도형은 일절 추가하지 않는다. 기관이 로고 파일을 제공하더라도 이 게시물에는 삽입하지 않는다.
-- 기존 TIO 표지 디자인을 유지한다. 놀이 기록 본문 2~4장은 `references/magazine-body.md`의 사진 위·글 아래 기사형 구조를 기본값으로 한다. 네 시안에서 활동 사실, 사진, 카피는 동일하게 두고 실제 디자인을 변주한다.
-- 이미지 생성 도구는 글자가 없는 사진 소재에만 사용한다. 실제 HTML/CSS 파이프라인을 실행하고 편집 가능한 HTML과 PNG를 확인하기 전 완료로 처리하지 않는다. 네 시안×4장의 기본 편집기와 권한 검수 규칙은 유지한다.
+## 필수 규칙
+표지·본문·카피 계약은 `references/quick-spec.md`를 따른다.
+4시안 레퍼런스와 디자인 근거는 `references/magazine-editions.md`를 따른다.

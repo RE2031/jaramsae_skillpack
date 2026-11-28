@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카드뉴스 스튜디오</title>
+<style>
+  :root{--bg:#F6F1E7;--ink:#22261F;--muted:#6F6A5E;--line:#DED5C4;--accent:#B4843C;--card:#FFFDF8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;line-height:1.5}
+  header{max-width:1320px;margin:0 auto;padding:28px 32px 8px}
+  header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.02em}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  main{max-width:1320px;margin:0 auto;padding:16px 32px 72px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
+  @media (max-width:1040px){main{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .card h2{margin:0 0 12px;font-size:15px;display:flex;gap:8px;align-items:baseline}
+  .card h2 span{font-size:12px;color:var(--muted);font-weight:400}
+  .row{display:grid;gap:14px;grid-template-columns:150px minmax(0,1fr)}
+  @media (max-width:560px){.row{grid-template-columns:1fr}}
+  .shot{position:relative;background:#EFEADF;border:1px dashed var(--line);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;text-align:center;cursor:pointer}
+  .shot.cover{aspect-ratio:4/5}
+  .shot.body{aspect-ratio:1.41/1}
+  .shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .field{margin-bottom:10px}
+  .lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+  input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;background:#fff;color:inherit;resize:vertical}
+  textarea{min-height:54px}
+  .hint{font-size:11px;color:var(--muted);margin:4px 0 0}
+  .rowline{display:flex;gap:8px;align-items:flex-start;font-size:13px}
+  .rowline input{margin-top:3px}
+  button{font:inherit;border-radius:9px;border:1px solid transparent;padding:10px 16px;cursor:pointer;background:#fff}
+  button.primary{background:var(--ink);color:#fff;font-weight:600}
+  button.primary:disabled{opacity:.55;cursor:progress}
+  button.ghost{border-color:var(--line)}
+  #status{font-size:13px;color:var(--muted);min-height:20px;margin:10px 0 0}
+  #results{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:700px){#results{grid-template-columns:1fr}}
+  .thumb{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px}
+  .thumb img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:6px;background:#EFEADF}
+  .pick{display:flex;gap:8px;align-items:center;font-size:13px}
+  .bar{grid-column:1/-1}
+  .bar .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .bar a{text-decoration:none;padding:10px 16px;border:1px solid var(--line);border-radius:9px;color:inherit;font-size:14px}
+  details{margin-top:12px;font-size:13px}
+  details pre{white-space:pre-wrap;font:inherit;margin:8px 0 0;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>인스타그램 카드뉴스 스튜디오</h1>
+  <p><strong id="inst">기관</strong> · 사진 네 장과 한 줄 설명만 넣으면 시안 4개(16장)가 나옵니다.</p>
+</header>
+<main>
+  <section>
+    <div class="card">
+      <div class="field">
+        <label class="lbl" for="activity">오늘의 활동</label>
+        <input id="activity" type="text" placeholder="블록 놀이 · 만 5세반">
+      </div>
+      <p class="hint">기관명은 저장된 프로필에서 가져옵니다. 제목을 비우면 설명으로 두 줄을 만들고, 본문을 비우면 설명이 본문이 됩니다.</p>
+    </div>
+    <div id="slots"></div>
+    <button id="render" class="primary">4시안 만들기</button>
+    <p id="status"></p>
+  </section>
+  <section id="results" hidden></section>
+</main>
+<script>
+const SLOT_LABEL = ['표지 사진', '사진 1', '사진 2', '사진 3'];
+const state = { photos: [null, null, null, null] };
+const val = id => document.getElementById(id).value.trim();
+
+function setStatus(text) { document.getElementById('status').textContent = text; }
+function escapeHtml(text) {
+  return String(text).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+}
+
+fetch('/api/profile').then(r => r.json()).then(data => {
+  document.getElementById('inst').textContent = data.profile.institution || '기관명 미설정';
+}).catch(() => {});
+
+const slots = document.getElementById('slots');
+SLOT_LABEL.forEach((label, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <h2>${label}<span>${i === 0 ? '표지 · 4:5' : '본문 · 사진 위'}</span></h2>
+    <div class="row">
+      <div>
+        <div class="shot ${i === 0 ? 'cover' : 'body'}" id="shot-${i}"><span>사진 넣는 곳</span></div>
+        <input type="file" accept="image/*" id="file-${i}" hidden>
+        <button class="ghost" type="button" id="pick-${i}" style="width:100%;margin-top:6px;padding:7px;font-size:13px">사진 고르기</button>
+      </div>
+      <div>
+        <div class="field">
+          <label class="lbl" for="desc-${i}">사진 설명</label>
+          <textarea id="desc-${i}" placeholder="${i === 0 ? '아이들이 블록 탑을 쌓고 있는 장면' : '무엇을 만들었고 어떻게 놀이했는지 한 줄로'}"></textarea>
+        </div>
+        <div class="field">
+          <label class="lbl" for="title-${i}">제목 (두 줄, 비우면 설명에서 자동)</label>
+          <textarea id="title-${i}" rows="2" placeholder="${i === 0 ? '블록으로 만든\n우리들의 마을' : ''}"></textarea>
+          <p class="hint">제목을 비우면 설명이 제목과 본문에 같이 들어갑니다. 직접 적으면 겹치지 않습니다.</p>
+        </div>
+        ${i === 0 ? '' : `
+        <div class="field">
+          <label class="lbl" for="body-${i}">본문 (2~3문장, 비우면 설명 사용)</label>
+          <textarea id="body-${i}" rows="2"></textarea>
+        </div>`}
+        <div class="rowline">
+          <input type="checkbox" id="owned-${i}">
+          <label for="owned-${i}">직접 촬영했고 보호자 동의를 확인했어요</label>
+        </div>
+        <p class="hint">체크하지 않으면 캡션과 출처 표기에 예시 이미지로 표시됩니다.</p>
+      </div>
+    </div>`;
+  slots.appendChild(card);
+
+  const file = document.getElementById(`file-${i}`);
+  document.getElementById(`pick-${i}`).onclick = () => file.click();
+  document.getElementById(`shot-${i}`).onclick = () => file.click();
+  file.onchange = () => { if (file.files[0]) loadPhoto(file.files[0], i); };
+});
+
+function loadPhoto(file, i) {
+  const url = URL.createObjectURL(file);
+  const image = new Image();
+  image.onload = () => {
+    const max = 1600;
+    const scale = Math.min(1, max / Math.max(image.width, image.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(image.width * scale);
+    canvas.height = Math.round(image.height * scale);
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    const data = canvas.toDataURL('image/jpeg', 0.92);
+    state.photos[i] = data;
+    const shot = document.getElementById(`shot-${i}`);
+    shot.innerHTML = '';
+    const preview = new Image();
+    preview.src = data;
+    shot.appendChild(preview);
+    URL.revokeObjectURL(url);
+    setStatus(`${SLOT_LABEL[i]} 준비됨 (${canvas.width}×${canvas.height})`);
+  };
+  image.onerror = () => { URL.revokeObjectURL(url); setStatus('사진을 읽지 못했습니다: ' + file.name); };
+  image.src = url;
+}
+
+document.getElementById('render').onclick = async () => {
+  const slides = [];
+  for (let i = 0; i < 4; i += 1) {
+    if (!state.photos[i]) { setStatus(`${SLOT_LABEL[i]}를 넣어 주세요.`); return; }
+    slides.push({
+      photo: state.photos[i],
+      description: val(`desc-${i}`),
+      title: document.getElementById(`title-${i}`).value,
+      body: i === 0 ? '' : val(`body-${i}`),
+      owned: document.getElementById(`owned-${i}`).checked,
+    });
+  }
+  const button = document.getElementById('render');
+  button.disabled = true;
+  setStatus('렌더 중입니다… 1~2분 걸립니다.');
+  try {
+    const response = await fetch('/api/render', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ activity: val('activity'), slides }),
+    });
+    const data = await response.json();
+    if (!data.ok) throw new Error(data.error || '렌더 실패');
+    showResults(data);
+    const notes = (data.warnings || []).join(' ');
+    setStatus('완료 — 오른쪽에서 시안을 고르세요.' + (notes ? ' (' + notes + ')' : ''));
+  } catch (error) {
+    setStatus('실패: ' + error.message);
+  } finally {
+    button.disabled = false;
+  }
+};
+
+function showResults(data) {
+  const box = document.getElementById('results');
+  box.hidden = false;
+  box.innerHTML = '';
+  data.editions.forEach((edition, index) => {
+    const column = document.createElement('div');
+    column.className = 'card';
+    column.innerHTML = `
+      <h2>${edition.name}</h2>
+      <div class="thumb">${edition.slides.map(src => `<img src="${src}" alt="${edition.name} 미리보기">`).join('')}</div>
+      <div class="pick">
+        <input type="radio" name="edition" value="${edition.id}" id="ed-${edition.id}" ${index === 0 ? 'checked' : ''}>
+        <label for="ed-${edition.id}">${edition.name} 선택</label>
+      </div>`;
+    box.appendChild(column);
+  });
+  const bar = document.createElement('div');
+  bar.className = 'card bar';
+  bar.innerHTML = `
+    <div class="actions">
+      <button class="primary" id="save">선택한 시안 PNG 저장</button>
+      <a href="${data.editor}" target="_blank" rel="noopener">편집기로 열기</a>
+      <span class="hint" id="saveMsg"></span>
+    </div>
+    <details><summary>캡션·해시태그 보기</summary><pre>${escapeHtml(data.caption)}\n\n${escapeHtml(data.hashtags.join(' '))}</pre></details>`;
+  box.appendChild(bar);
+
+  document.getElementById('save').onclick = async () => {
+    const checked = document.querySelector('input[name=edition]:checked');
+    const message = document.getElementById('saveMsg');
+    message.textContent = '저장 중…';
+    try {
+      const response = await fetch('/api/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ runId: data.runId, edition: checked.value }),
+      });
+      const result = await response.json();
+      message.textContent = result.ok ? '저장됨: ' + result.folder : '실패: ' + result.error;
+    } catch (error) {
+      message.textContent = '실패: ' + error.message;
+    }
+  };
+}
+</script>
+</body>
+</html>
