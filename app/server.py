@@ -1,37 +1,31 @@
 #!/usr/bin/env python3
-"""Local studio: four photos + short descriptions -> four TIO editions.
-
-Runs on 127.0.0.1 only and shells out to scripts/make_editions.py, so the
-rendered PNGs are identical to the command-line pipeline.
-"""
+"""Local card-news studio backed by the command-line renderer."""
 import argparse
 import base64
 import io
 import json
 import os
-import shutil
 import subprocess
 import sys
-import time
 import traceback
+import re
+from tempfile import TemporaryDirectory
+from uuid import uuid4
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from export_editor_selection import export
+from make_editions import EDITIONS
+
 APP = Path(__file__).resolve().parent
 OUT = ROOT / 'output'
 RUNS = OUT / 'runs'
-EDITIONS = ['signature', 'modern', 'story', 'creative']
-NAMES = {
-    'signature': 'A · Signature',
-    'modern': 'B · Modern',
-    'story': 'C · Story',
-    'creative': 'D · Creative',
-}
-EYEBROWS = ['오늘의 놀이 기록', '놀이의 시작', '아이들이 해본 일', '이어진 놀이']
+EYEBROWS = ['매거진', '이야기의 시작', '이야기 속 한 장면', '이야기를 마치며']
 BRAND = {'primary': '#2E332B', 'background': '#F6F1E7', 'accent': '#B4843C'}
 MIME = {
     '.png': 'image/png',
@@ -40,6 +34,8 @@ MIME = {
     '.html': 'text/html; charset=utf-8',
     '.json': 'application/json; charset=utf-8',
     '.md': 'text/markdown; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.mp4': 'video/mp4',
 }
 
 
@@ -98,15 +94,15 @@ def save_photo(data_url, path):
 
 
 def build_feed(payload, run_dir, profile):
-    institution = (profile.get('institution') or '').strip()
+    institution = (payload.get('displayName') or profile.get('institution') or '').strip()
     if not institution:
-        raise ValueError('기관 프로필이 없습니다. profiles/<id>/brand-profile.json 을 먼저 저장해 주세요.')
+        raise ValueError('표시 이름을 입력해 주세요.')
     slides = payload.get('slides') or []
     if len(slides) != 4:
         raise ValueError('사진 4장이 필요합니다 (표지 + 사진 1~3).')
-    activity = ' '.join((payload.get('activity') or '').split())
-    fallback = activity or '오늘의 기록'
-
+    activity = ' '.join((payload.get('topic') or payload.get('activity') or '').split())
+    if not activity:
+        raise ValueError('이번 게시물 주제를 입력해 주세요.')
     photo_dir = run_dir / 'photos'
     photo_dir.mkdir(parents=True, exist_ok=True)
     for index, slide in enumerate(slides, 1):
@@ -131,56 +127,84 @@ def build_feed(payload, run_dir, profile):
         if len(body) > 180:
             body = body[:180]
             warnings.append(f'{index + 1}번째 본문이 180자를 넘어 잘렸습니다.')
-        lines = []
-        clipped = False
-        for line in two_lines(slide.get('title') or description, activity_title).split('\n'):
-            fitted, cut = clamp_line(line)
-            lines.append(fitted)
-            clipped = clipped or cut
-        if clipped:
-            warnings.append(f'{index + 1}번째 제목이 길어 두 줄에 맞게 줄였습니다.')
-        feed_slides.append({
-            'title': '\n'.join(lines)[:60],
-            'eyebrow': (slide.get('eyebrow') or EYEBROWS[index])[:40],
+        title = (slide.get('title') or '').strip()
+        if index == 0:
+            if title:
+                if len(title.splitlines()) != 2 or any(not line.strip() for line in title.splitlines()):
+                    raise ValueError('표지 제목은 줄바꿈 한 번으로 두 줄을 적어 주세요.')
+                title = '\n'.join(title.splitlines())
+            else:
+                title = '\n'.join(clamp_line(line)[0] for line in two_lines(activity_title, '이야기').split('\n'))
+        else:
+            title = title or EYEBROWS[index]
+        if len(title) > 60:
+            raise ValueError(f'{index + 1}번째 제목을 60자 이내로 써 주세요.')
+        entry = {
+            'title': title,
+            'eyebrow': (slide.get('eyebrow') or (activity if index == 0 and len(activity) <= 18 else EYEBROWS[index]))[:40],
             'body': body[:180],
             'layout': 'fullbleed-photo',
             'image': f'photos/photo-{index + 1:02d}.jpg',
             'image_approved': True,
-            'image_kind': 'institution' if owned else 'stock',
-            'image_source': '기관 제공' if owned else '예시 이미지',
-            'image_credit': '기관 제공 사진' if owned else '예시 이미지 · 실제 기관 활동 사진 아님',
-        })
+            'image_kind': 'provided' if owned else 'stock',
+            'image_source': '사용자 제공' if owned else '예시 이미지',
+            'image_credit': '사용자 제공 사진' if owned else '예시 이미지',
+        }
+        if index == 0:
+            for field in ('image_zoom', 'image_focus_x', 'image_focus_y'):
+                if field in slide:
+                    entry[field] = slide[field]
+        else:
+            for field in ('aside', 'question', 'quote', 'subtitle'):
+                value = (slide.get(field) or '').strip()
+                if value:
+                    entry[field] = value
+            if slide.get('video') and payload.get('selection') in ('all','video'):
+                entry['video'] = f'photos/video-{index + 1:02d}.mp4'
+                (run_dir/entry['video']).write_bytes(base64.b64decode(slide['video'].split(',',1)[-1],validate=True))
+        feed_slides.append(entry)
 
     head = ' '.join(part for part in [institution, activity, '기록입니다.'] if part)
     paragraphs = [head] + [text for text in captions if text]
     if any_example:
-        paragraphs.append('사진은 실제 기관 활동을 촬영한 것이 아닌 예시 이미지입니다.')
+        paragraphs.append('사진에는 실제 게시물 대상을 촬영하지 않은 예시 이미지가 포함되어 있습니다.')
     caption = '\n\n'.join(paragraphs)
-    hashtags = ['#' + institution.replace(' ', ''), '#놀이기록', '#어린이집일상']
+    hashtags = ['#' + re.sub(r'[^\w]','',value) for value in (institution,activity) if re.search(r'\w',value)]
 
     feed = {
         'institution': institution,
-        'goal': '학부모에게 아이들의 일상과 활동 전달',
+        'goal': activity,
         'style': 'bold-photo-editorial',
-        'brand': dict(BRAND),
+        'brand': {key:(profile.get('colors') or profile.get('brand') or {}).get(key,value) for key,value in BRAND.items()},
         'draft': True,
         'posts': [{
-            'category': '오늘의 놀이 기록',
-            'purpose': activity or '오늘의 놀이 기록',
+            'category': activity,
+            'purpose': activity,
             'caption': caption,
             'hashtags': hashtags,
             'slides': feed_slides,
         }],
     }
+    if payload.get('logo') and payload.get('selection') in ('all','overlay'):
+        raw = base64.b64decode(payload['logo'].split(',',1)[-1],validate=True)
+        with Image.open(io.BytesIO(raw)) as logo:
+            logo.thumbnail((640,640))
+            logo.convert('RGBA').save(photo_dir/'brand-logo.png')
+        feed['logo'] = 'photos/brand-logo.png'
+    for field in ('interview_source','issue'):
+        if payload.get(field):
+            feed[field] = payload[field]
     return feed, caption, hashtags, warnings
 
 
 def handle_render(payload):
     profile = load_profile()
-    run_id = time.strftime('%y%m%d-%H%M%S')
+    selection = payload.get('selection') or 'all'
+    if selection != 'all' and selection not in EDITIONS:
+        raise ValueError('본문 스타일을 선택해 주세요.')
+    payload['selection'] = selection
+    run_id = uuid4().hex
     run_dir = RUNS / run_id
-    if run_dir.exists():
-        raise ValueError('잠시 후 다시 시도해 주세요 (같은 초에 두 번 요청).')
     run_dir.mkdir(parents=True)
 
     feed, caption, hashtags, warnings = build_feed(payload, run_dir, profile)
@@ -188,9 +212,12 @@ def handle_render(payload):
     feed_path.write_text(json.dumps(feed, ensure_ascii=False, indent=2), encoding='utf-8')
 
     env = dict(os.environ, PYTHONIOENCODING='utf-8')
+    command = [sys.executable, str(ROOT / 'scripts/make_editions.py'), str(feed_path),
+               '--out', str(run_dir / 'editions'), '--export-url',f'/api/export?run={run_id}']
+    if selection != 'all':
+        command.extend(['--style',selection])
     proc = subprocess.run(
-        [sys.executable, str(ROOT / 'scripts/make_editions.py'), str(feed_path),
-         '--out', str(run_dir / 'editions')],
+        command,
         capture_output=True, text=True, encoding='utf-8', errors='replace',
         env=env, cwd=str(ROOT), timeout=900,
     )
@@ -200,10 +227,14 @@ def handle_render(payload):
 
     editions = [{
         'id': edition,
-        'name': NAMES[edition],
-        'slides': [f'/files/runs/{run_id}/editions/{edition}/png/post-01-slide-{n:02d}.png'
-                   for n in range(1, 5)],
-    } for edition in EDITIONS]
+        'name': EDITIONS[edition],
+        'slides': [
+            {'poster': f'/files/runs/{run_id}/editions/{edition}/png/{stem}.png',
+             'video': f'/files/runs/{run_id}/editions/{edition}/mp4/{stem}.mp4'
+             if (run_dir/'editions'/edition/'mp4'/f'{stem}.mp4').is_file() else None}
+            for stem in (f'post-01-slide-{n:02d}' for n in range(1,5))
+        ],
+    } for edition in (EDITIONS if selection == 'all' else [selection])]
     return {
         'ok': True,
         'runId': run_id,
@@ -218,25 +249,27 @@ def handle_render(payload):
 def handle_export(payload):
     run_id = str(payload.get('runId') or '')
     edition = str(payload.get('edition') or '')
-    if edition not in EDITIONS:
+    if edition not in EDITIONS or not re.fullmatch(r'[a-f0-9]{32}',run_id):
         raise ValueError('시안을 다시 선택해 주세요.')
-    source = RUNS / run_id / 'editions' / edition / 'png'
-    if not source.is_dir():
-        raise ValueError('해당 시안 PNG를 찾지 못했습니다.')
-    folder = OUT / f'approved-{run_id}-{edition}'
-    if folder.exists():
-        shutil.rmtree(folder)
-    shutil.copytree(source, folder)
-    files = sorted(p.name for p in folder.glob('*.png'))
+    source = RUNS / run_id / 'editions' / edition / 'editable' / 'index.html'
+    if not source.is_file():
+        raise ValueError('해당 시안을 찾지 못했습니다.')
+    folder = OUT / f'approved-{run_id}-{edition}-{uuid4().hex[:8]}'
+    with TemporaryDirectory(dir=OUT) as temp:
+        staging = Path(temp)/'cards'
+        export(source,staging,edits=payload.get('edits'))
+        files = sorted(p.name for p in staging.iterdir())
+        staging.rename(folder)
     return {
         'ok': True,
         'folder': str(folder.relative_to(ROOT)),
-        'files': [f'/files/approved-{run_id}-{edition}/{name}' for name in files],
+        'files': [f'/files/{folder.name}/{name}' for name in files],
     }
 
 
 class Handler(BaseHTTPRequestHandler):
     server_version = 'JaramsaeStudio/1.0'
+    protocol_version = 'HTTP/1.1'
 
     def log_message(self, fmt, *args):
         print('%s - %s' % (self.address_string(), fmt % args), flush=True)
@@ -245,6 +278,38 @@ class Handler(BaseHTTPRequestHandler):
         path = Path(path)
         if not path.is_file():
             return self.send_error(404)
+        size = path.stat().st_size
+        if path.suffix == '.mp4':
+            header = self.headers.get('Range')
+            match = re.fullmatch(r'bytes=(\d*)-(\d*)',header or '')
+            if header and (not match or not any(match.groups())):
+                return self.send_error(416)
+            start, end = 0, size - 1
+            if match:
+                first,last = match.groups()
+                start = int(first) if first else max(0,size - int(last))
+                end = min(end,int(last)) if first and last else end
+                if not 0 <= start <= end < size:
+                    self.send_response(416)
+                    self.send_header('Content-Range',f'bytes */{size}')
+                    self.send_header('Content-Length','0')
+                    self.end_headers()
+                    return
+            self.send_response(206 if match else 200)
+            self.send_header('Content-Type','video/mp4')
+            self.send_header('Accept-Ranges','bytes')
+            self.send_header('Content-Length',str(end - start + 1))
+            if match:
+                self.send_header('Content-Range',f'bytes {start}-{end}/{size}')
+            self.end_headers()
+            with path.open('rb') as stream:
+                stream.seek(start)
+                left = end - start + 1
+                while left:
+                    chunk = stream.read(min(left,65536))
+                    self.wfile.write(chunk)
+                    left -= len(chunk)
+            return
         data = path.read_bytes()
         self.send_response(200)
         self.send_header('Content-Type', MIME.get(path.suffix.lower(), 'application/octet-stream'))
@@ -264,14 +329,17 @@ class Handler(BaseHTTPRequestHandler):
 
     def read_json(self):
         length = int(self.headers.get('Content-Length') or 0)
-        if length <= 0:
-            raise ValueError('빈 요청입니다.')
+        if not 0 < length <= 180 * 1024**2:
+            self.close_connection = True
+            raise ValueError('요청이 비어 있거나 업로드 용량이 너무 큽니다.')
         return json.loads(self.rfile.read(length).decode('utf-8'))
 
     def do_GET(self):
         path = unquote(urlparse(self.path).path)
         if path in ('/', '/index.html'):
             return self.send_file(APP / 'static' / 'index.html')
+        if path == '/studio-style.css':
+            return self.send_file(ROOT/'templates/style.css')
         if path == '/api/profile':
             return self.send_json({'profile': load_profile()})
         if path.startswith('/files/'):
@@ -288,6 +356,9 @@ class Handler(BaseHTTPRequestHandler):
             if path == '/api/render':
                 return self.send_json(handle_render(payload))
             if path == '/api/export':
+                query = parse_qs(urlparse(self.path).query)
+                if 'run' in query:
+                    payload['runId'] = query['run'][0]
                 return self.send_json(handle_export(payload))
             return self.send_error(404)
         except ValueError as error:
@@ -304,7 +375,10 @@ def main():
     args = parser.parse_args()
     OUT.mkdir(exist_ok=True)
     RUNS.mkdir(exist_ok=True)
-    httpd = ThreadingHTTPServer((args.host, args.port), Handler)
+    class StudioServer(ThreadingHTTPServer):
+        request_queue_size = 32
+
+    httpd = StudioServer((args.host, args.port), Handler)
     print(f'STUDIO_READY http://{args.host}:{args.port}/', flush=True)
     httpd.serve_forever()
 

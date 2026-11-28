@@ -141,6 +141,48 @@
 
 /* Plain institution name: no generated logo or extra mark. */
 .signature-cover .cover-brand::before,.signature-cover .cover-brand::after{content:none!important;display:none!important}
+
+.magazine-card{padding:54px 64px 44px;gap:0}
+.magazine-card h1{font-size:72px;line-height:1.17;letter-spacing:-3px}
+.magazine-card p{font-size:40px;line-height:1.42}
+.magazine-card .category{font-size:29px;letter-spacing:0;margin-bottom:12px}
+.magazine-card .mag-copy{display:grid;gap:15px}
+.magazine-card footer{width:100%;font-size:25px;padding-top:14px}
+.magazine-card footer span:last-child{font-size:23px}
+
+.magazine-playful{background:#fff1d9;color:#2c2330}
+.magazine-playful .art{margin:20px 20px 24px;height:685px;border:12px solid #fffdf8;border-radius:70px 70px 100px 70px;background:#f4caad;box-shadow:9px 13px 0 #dab5c9;transform:rotate(-1.7deg)}
+.magazine-playful .mag-copy{margin:26px 14px 0}
+.magazine-playful .category{justify-self:start;margin:0;background:#f5c856;border-radius:38px;padding:10px 24px;font-weight:850}
+.magazine-playful .spark{position:absolute;top:45px;left:46px;font-size:92px;color:#f5c856;-webkit-text-stroke:2px #422b36;line-height:1}
+.magazine-playful .photo-aside{position:absolute;right:53px;top:590px;max-width:520px;padding:20px 31px;border:4px solid #4c3547;border-radius:46px 46px 10px 46px;background:#ffe6f1;font-size:34px;font-weight:800;white-space:pre-wrap;overflow-wrap:anywhere}
+
+.magazine-overlay,.magazine-video{isolation:isolate;color:white;background:#14171a}
+.magazine-overlay .art,.magazine-video .art{position:absolute;inset:0;height:100%;border-radius:0;z-index:-2;background:#14171a}
+.magazine-card video{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.magazine-card.is-playing video{display:block}
+.magazine-card .media-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#050a10aa,transparent 22%,transparent 34%,#050a10d9 72%,#050a10fc)}
+.magazine-overlay .mag-copy,.magazine-video .mag-copy{margin-top:auto}
+.magazine-overlay footer,.magazine-video footer{margin-top:28px;color:#f1f1f1}
+.overlay-brand{position:absolute;top:54px;left:64px;width:320px;height:110px;display:flex;align-items:center;justify-content:flex-start}
+.overlay-brand img{max-width:100%;max-height:100%;object-fit:contain;object-position:left center}
+.overlay-brand span{font-size:40px;font-weight:850;overflow-wrap:anywhere;text-shadow:0 2px 8px #000}
+.magazine-video .category{color:#caf2ee}
+.magazine-video .media-shade{background:linear-gradient(180deg,#08262980,transparent 24%,transparent 34%,#092528d9 68%,#092528 92%)}
+.magazine-video .media-shade:after{content:"";position:absolute;inset:42px 48px auto;height:560px;border-top:5px solid #caf2ee;border-left:5px solid #caf2ee;border-right:5px solid #caf2ee;mask-image:linear-gradient(black 0 12%,transparent 37%)}
+.magazine-video .mag-copy{padding:32px 0 16px;border-top:5px solid #caf2ee}
+.magazine-video .video-subtitle{max-width:100%;justify-self:center;background:#caf2ee;border-radius:10px;padding:14px 28px;color:#11292b;font-size:38px;font-weight:750;line-height:1.35;text-align:center;white-space:pre-wrap;overflow-wrap:anywhere}
+
+.magazine-interview{background:#f7f3e9;color:#27221c}
+.magazine-interview .issue{font:700 28px/1.2 Georgia,"Batang",serif;padding-bottom:16px;border-bottom:2px solid currentColor}
+.magazine-interview .section-label{font:700 40px/1.2 Georgia,serif;letter-spacing:4px;margin:17px 0 22px;color:#8d382f}
+.magazine-interview .art{height:420px;border-radius:0;margin-bottom:25px}
+.magazine-interview h1{font-family:Georgia,"Batang",serif;font-size:64px}
+.magazine-interview p{font-size:36px}
+.magazine-interview .interview-question{font-size:34px;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-interview blockquote{margin:0;padding:13px 0 0 21px;border-left:5px solid #8d382f;font:700 46px/1.28 Georgia,"Batang",serif;white-space:pre-wrap;overflow-wrap:anywhere}
+.magazine-interview blockquote b{color:#8d382f;font-size:30px}
+.magazine-interview footer{border-top:2px solid currentColor}
 /* Approved article body: top photo, bottom paper, no text overlay. */
 .slide.article-body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:775px minmax(0,1fr);gap:0;padding:0;background:#faf5ee;color:#503020}
 .slide.article-body .art{width:100%;height:100%;min-height:0;border-radius:0;overflow:hidden}

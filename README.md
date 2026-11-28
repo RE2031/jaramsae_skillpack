@@ -1,16 +1,16 @@
 # Instagram Feed Skill Pack v0.8
 AI 에이전트는 `AGENTS.md` → `references/quick-spec.md` 한 장으로 시작하면 된다(전체 문서를 읽지 않아도 된다).
 
-한국어 보육기관 인스타그램 피드 제작용 Agent Skills + 렌더러. 원장의 자연어 요청을 받은 AI 에이전트가 콘텐츠 JSON을 작성하고, 로컬 렌더러가 편집 가능한 HTML/CSS와 PNG를 생성한다. 자체 서비스 홍보 및 자동 게시 기능은 범위 밖이다.
+인스타그램 카드뉴스 제작용 Agent Skills와 로컬 스튜디오. 표시 이름과 주제, 사진과 원고를 한 번 넣고 공통 Signature 표지와 네 가지 본문 스타일을 만들 수 있다. 기존 보육기관 프로필도 이어서 사용한다.
 
 ## 빠른 시작
 Python 3.10+ 및 한국어 폰트(Noto Sans CJK KR 또는 맑은 고딕)를 설치한다.
 ```bash
 python -m pip install -r requirements.txt
 python -m playwright install chromium
-python scripts/pipeline.py examples/demo.json --out output/demo
+python -X utf8 app/server.py --port 8765
 ```
-Windows에서도 동일하게 실행한다. 시스템 Chromium을 사용하려면 `--browser /path/to/chromium`을 추가한다. `output/demo/preview.html`을 브라우저에서 열면 피드와 슬라이드를 확인할 수 있다.
+브라우저에서 [로컬 스튜디오](http://127.0.0.1:8765/)를 연다. 스타일을 만든 후 **편집·저장**에서 수정하고 정지 PNG와 자막 포함 MP4를 장 순서대로 저장한다. [빠른 제작 규칙](references/quick-spec.md)에 스타일별 입력과 CLI 실행 방법이 있다.
 
 ## AI 에이전트 사용
 저장소를 에이전트에서 열고 다음처럼 요청한다.

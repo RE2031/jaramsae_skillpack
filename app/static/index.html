@@ -42,6 +42,13 @@
   .bar{grid-column:1/-1}
   .bar .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .bar a{text-decoration:none;padding:10px 16px;border:1px solid var(--line);border-radius:9px;color:inherit;font-size:14px}
+  [hidden]{display:none!important}
+  .style-choices,.render-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .style-choices [aria-pressed=true]{background:var(--ink);color:white}
+  .preview{width:min(240px,100%);aspect-ratio:4/5;position:relative;overflow:hidden;margin:12px auto;background:#e6ddd1;border-radius:8px}
+  .preview iframe{position:absolute;width:1080px;height:1350px;transform-origin:top left;border:0}
+  .thumb video{width:100%;aspect-ratio:4/5;display:block;background:#181815;border-radius:6px}
+  .thumb:has(video){grid-template-columns:repeat(2,minmax(0,1fr))}
   details{margin-top:12px;font-size:13px}
   details pre{white-space:pre-wrap;font:inherit;margin:8px 0 0;color:var(--muted)}
 </style>
@@ -49,35 +56,58 @@
 <body>
 <header>
   <h1>인스타그램 카드뉴스 스튜디오</h1>
-  <p><strong id="inst">기관</strong> · 사진 네 장과 한 줄 설명만 넣으면 시안 4개(16장)가 나옵니다.</p>
+  <p>표지 한 장과 본문 세 장을 만들고, 같은 자료로 본문 스타일을 비교할 수 있습니다.</p>
 </header>
 <main>
   <section>
     <div class="card">
-      <div class="field">
-        <label class="lbl" for="activity">오늘의 활동</label>
-        <input id="activity" type="text" placeholder="블록 놀이 · 만 5세반">
+      <div class="field"><label class="lbl" for="displayName">표시 이름</label><input id="displayName" type="text" placeholder="계정 또는 브랜드 이름"></div>
+      <div class="field"><label class="lbl" for="activity">이번 게시물 주제</label><input id="activity" type="text" placeholder="동네 독립서점 인터뷰"></div>
+    </div>
+    <div id="cover-slot"></div>
+    <div class="card">
+      <h2>공통 표지 미리보기</h2>
+      <div class="preview" id="cover-preview"></div>
+      <h2>본문 스타일</h2>
+      <div class="style-choices" id="styles"></div>
+      <div class="preview" id="body-preview"></div>
+      <p class="hint" id="style-help"></p>
+      <div class="field" data-style="overlay" hidden><label class="lbl" for="logo">본문 로고 (선택)</label><input id="logo" type="file" accept="image/png,image/jpeg,image/webp"><p class="hint">로고가 비어 있으면 표시 이름을 사용합니다.</p></div>
+      <div data-style="interview" hidden>
+        <div class="field"><label class="lbl" for="issue">발행호 (선택)</label><input id="issue" type="text" maxlength="30" placeholder="VOL. 01"></div>
+        <div class="field"><label class="lbl" for="transcript">인터뷰 원문</label><textarea id="transcript" maxlength="20000"></textarea><p class="hint">인용문 칸에는 원문의 연속된 문장을 그대로 붙여 넣으세요.</p></div>
       </div>
-      <p class="hint">기관명은 저장된 프로필에서 가져옵니다. 제목을 비우면 설명으로 두 줄을 만들고, 본문을 비우면 설명이 본문이 됩니다.</p>
     </div>
     <div id="slots"></div>
-    <button id="render" class="primary">4시안 만들기</button>
-    <p id="status"></p>
+    <div class="render-actions"><button id="render" class="primary">선택한 스타일 만들기</button><button id="compare" class="ghost">4종 비교하기</button></div>
+    <p id="status" role="status"></p>
   </section>
   <section id="results" hidden></section>
 </main>
 <script>
-const SLOT_LABEL = ['표지 사진', '사진 1', '사진 2', '사진 3'];
-const state = { photos: [null, null, null, null] };
-const val = id => document.getElementById(id).value.trim();
-
-function setStatus(text) { document.getElementById('status').textContent = text; }
+const SLOT_LABEL = ['표지 사진', '본문 1', '본문 2', '본문 3'];
+const styles = {
+  playful: ['A · 아기자기 편집형', '사진 속 물건에 말풍선을 붙여 사진과 문구가 한 장면을 만들게 하세요.'],
+  overlay: ['B · 사진 오버레이형', '본문은 사진을 꽉 채우고 같은 상단 위치에 로고나 표시 이름을 넣습니다.'],
+  video: ['C · 영상 매거진형', '영상 한 장을 앞뒤 정지 카드 사이에 배치하면 맥락과 결론을 읽기 쉽습니다. 영상이 비어 있으면 사진을 사용합니다.'],
+  interview: ['D · 인터뷰 지면형', '인물과 맥락 소개 → 원문에서 가져온 답변 → 후속 질문 또는 마무리'],
+};
+const state = { photos: [null, null, null, null], style: 'playful', logo: '' };
+const $ = id => document.getElementById(id);
+const val = id => $(id).value.trim();
+const readFile = file => file ? new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+  reader.readAsDataURL(file);
+}) : Promise.resolve('');
+function setStatus(text) { $('status').textContent = text; }
 function escapeHtml(text) {
-  return String(text).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 }
-
 fetch('/api/profile').then(r => r.json()).then(data => {
-  document.getElementById('inst').textContent = data.profile.institution || '기관명 미설정';
+  if (!$('displayName').value) $('displayName').value = data.profile.institution || '';
+  showPreview();
 }).catch(() => {});
 
 const slots = document.getElementById('slots');
@@ -85,7 +115,7 @@ SLOT_LABEL.forEach((label, i) => {
   const card = document.createElement('div');
   card.className = 'card';
   card.innerHTML = `
-    <h2>${label}<span>${i === 0 ? '표지 · 4:5' : '본문 · 사진 위'}</span></h2>
+    <h2>${label}<span>${i === 0 ? '표지 · 4:5' : '사진과 원고'}</span></h2>
     <div class="row">
       <div>
         <div class="shot ${i === 0 ? 'cover' : 'body'}" id="shot-${i}"><span>사진 넣는 곳</span></div>
@@ -95,26 +125,26 @@ SLOT_LABEL.forEach((label, i) => {
       <div>
         <div class="field">
           <label class="lbl" for="desc-${i}">사진 설명</label>
-          <textarea id="desc-${i}" placeholder="${i === 0 ? '아이들이 블록 탑을 쌓고 있는 장면' : '무엇을 만들었고 어떻게 놀이했는지 한 줄로'}"></textarea>
+          <textarea id="desc-${i}" placeholder="${i === 0 ? '표지 사진에 담긴 장면' : '사진에 담긴 장면이나 카드의 핵심'}"></textarea>
         </div>
         <div class="field">
-          <label class="lbl" for="title-${i}">제목 (두 줄, 비우면 설명에서 자동)</label>
-          <textarea id="title-${i}" rows="2" placeholder="${i === 0 ? '블록으로 만든\n우리들의 마을' : ''}"></textarea>
-          <p class="hint">제목을 비우면 설명이 제목과 본문에 같이 들어갑니다. 직접 적으면 겹치지 않습니다.</p>
+          <label class="lbl" for="title-${i}">${i === 0 ? '표지 제목 (두 줄)' : '본문 제목'}</label>
+          <textarea id="title-${i}" rows="2" placeholder="${i === 0 ? '우리 동네\n책방 이야기' : ''}"></textarea>
+
         </div>
-        ${i === 0 ? '' : `
-        <div class="field">
-          <label class="lbl" for="body-${i}">본문 (2~3문장, 비우면 설명 사용)</label>
-          <textarea id="body-${i}" rows="2"></textarea>
-        </div>`}
+        ${i === 0 ? `<div class="field"><label class="lbl" for="eyebrow-0">표지 도입 문구</label><input id="eyebrow-0" type="text" maxlength="18"></div>` : `
+        <div class="field"><label class="lbl" for="body-${i}">본문 (비우면 사진 설명 사용)</label><textarea id="body-${i}" maxlength="180"></textarea></div>
+        <div class="field" data-style="playful"><label class="lbl" for="aside-${i}">사진 속 한마디 (선택)</label><input id="aside-${i}" type="text" maxlength="48"></div>
+        <div class="field" data-style="video" hidden><label class="lbl" for="video-${i}">짧은 영상 (선택, 30초까지 사용)</label><input id="video-${i}" type="file" accept="video/*"><label class="lbl" for="subtitle-${i}">영상 자막</label><textarea id="subtitle-${i}" maxlength="100"></textarea></div>
+        <div class="field" data-style="interview" hidden><label class="lbl" for="question-${i}">질문 (선택)</label><input id="question-${i}" type="text" maxlength="100"><label class="lbl" for="quote-${i}">직접 인용 (선택)</label><textarea id="quote-${i}" maxlength="110"></textarea></div>`}
         <div class="rowline">
           <input type="checkbox" id="owned-${i}">
-          <label for="owned-${i}">직접 촬영했고 보호자 동의를 확인했어요</label>
+          <label for="owned-${i}">내 게시물에 사용할 권한이 있는 실제 사진입니다</label>
         </div>
         <p class="hint">체크하지 않으면 캡션과 출처 표기에 예시 이미지로 표시됩니다.</p>
       </div>
     </div>`;
-  slots.appendChild(card);
+  (i === 0 ? $('cover-slot') : slots).appendChild(card);
 
   const file = document.getElementById(`file-${i}`);
   document.getElementById(`pick-${i}`).onclick = () => file.click();
@@ -140,88 +170,142 @@ function loadPhoto(file, i) {
     preview.src = data;
     shot.appendChild(preview);
     URL.revokeObjectURL(url);
+    showPreview();
     setStatus(`${SLOT_LABEL[i]} 준비됨 (${canvas.width}×${canvas.height})`);
   };
   image.onerror = () => { URL.revokeObjectURL(url); setStatus('사진을 읽지 못했습니다: ' + file.name); };
   image.src = url;
 }
 
-document.getElementById('render').onclick = async () => {
-  const slides = [];
-  for (let i = 0; i < 4; i += 1) {
-    if (!state.photos[i]) { setStatus(`${SLOT_LABEL[i]}를 넣어 주세요.`); return; }
-    slides.push({
-      photo: state.photos[i],
-      description: val(`desc-${i}`),
-      title: document.getElementById(`title-${i}`).value,
-      body: i === 0 ? '' : val(`body-${i}`),
-      owned: document.getElementById(`owned-${i}`).checked,
-    });
+for (const [id,[name]] of Object.entries(styles)) {
+  const button = document.createElement('button');
+  button.className = 'ghost';
+  button.textContent = name;
+  button.dataset.variant = id;
+  button.onclick = () => selectStyle(id);
+  $('styles').append(button);
+}
+function selectStyle(id) {
+  state.style = id;
+  for (const button of $('styles').children) button.setAttribute('aria-pressed', button.dataset.variant === id);
+  document.querySelectorAll('[data-style]').forEach(field => field.hidden = field.dataset.style !== id);
+  $('style-help').textContent = styles[id][1];
+  showPreview();
+}
+for (const id of ['cover-preview','body-preview']) {
+  const box = $(id);
+  const frame = document.createElement('iframe');
+  frame.title = id === 'cover-preview' ? '공통 표지' : '본문 스타일 예시';
+  frame.setAttribute('sandbox','');
+  box.append(frame);
+  new ResizeObserver(() => frame.style.transform = `scale(${box.clientWidth / 1080})`).observe(box);
+}
+function showPreview() {
+  const esc = escapeHtml;
+  const brand = esc(val('displayName') || '표시 이름');
+  const rawTitle = val('title-0').split(/\n/);
+  const topicWords = val('activity').split(/\s+/).filter(word => word && !['·','|','/','-'].includes(word));
+  const mid = Math.max(1, Math.floor(topicWords.length / 2));
+  const fit = line => {
+    if (line.length <= 11) return line;
+    const cut = line.slice(0, 11);
+    return (cut.includes(' ') ? cut.slice(0, cut.lastIndexOf(' ')).trim() : '') || cut;
+  };
+  const derived = topicWords.length ? [topicWords.slice(0,mid).join(' '),topicWords.slice(mid).join(' ') || '이야기'].map(fit) : ['우리 동네','책방 이야기'];
+  const lines = rawTitle.length === 2 ? rawTitle : derived;
+  const photo = i => state.photos[i] ? `<img src="${state.photos[i]}" alt=""${i === 0 ? ' style="object-position:50% 50%;transform:scale(1.15)"' : ''}>` : '';
+  const credit = i => $(`owned-${i}`).checked ? '사용자 제공' : '예시 이미지';
+  const wrapper = html => '<!doctype html><html lang="ko"><meta charset="utf-8"><link rel="stylesheet" href="/studio-style.css"><body>'+html+'</body></html>';
+  const colors = 'style="--primary:#2e332b;--bg:#f6f1e7;--accent:#b4843c"';
+  const cover = wrapper(`<article class="slide preset-bold-photo-editorial signature-cover" ${colors}><div class="art" style="background:#444a43">${photo(0)}</div><div class="cover-brand">${brand}</div><div class="cover-copy"><div class="cover-eyebrow">${esc(val('eyebrow-0') || (val('activity').length <= 18 && val('activity')) || '매거진')}</div><h1><span>${esc(lines[0])}</span><span>${esc(lines[1])}</span></h1></div><div class="cover-credit">출처 | ${credit(0)}</div></article>`);
+  const coverFrame = $('cover-preview').firstChild;
+  if (coverFrame.srcdoc !== cover) coverFrame.srcdoc = cover;
+  const style = state.style;
+  const i = 2;
+  const art = `<div class="art">${photo(i)}</div>`;
+  const headline = esc(val('title-2') || '책방이 고른 한 문장');
+  const body = esc(val('body-2') || val('desc-2') || '이 동네에서 읽는 즐거움을 나누는 법을 물었습니다.');
+  const topic = '<div class="category">이야기 속 한 장면</div>';
+  const copy = extra => `<div class="mag-copy">${topic}<h1>${headline}</h1><p>${body}</p>${extra || ''}</div>`;
+  let content;
+  if (style === 'playful') content = art + '<span class="spark">✦</span><div class="photo-aside">'+esc(val('aside-2') || '저부터 읽어보실래요?')+'</div>' + copy();
+  if (style === 'overlay') content = art + '<div class="media-shade"></div><div class="overlay-brand">'+(state.logo ? `<img src="${esc(state.logo)}" alt="">` : `<span>${brand}</span>`)+'</div>' + copy();
+  if (style === 'video') content = art + '<div class="media-shade"></div>' + copy('<div class="video-subtitle">'+esc(val('subtitle-2') || '영상이 담을 한 문장')+'</div>');
+  if (style === 'interview') content = '<div class="issue">'+esc(val('issue') || 'VOL. 01')+'</div><div class="section-label">INTERVIEW</div>' + art + copy('<div class="interview-question"><b>Q.</b> '+esc(val('question-2') || '책방을 연 이유는 무엇인가요?')+'</div><blockquote><b>A.</b> '+esc(val('quote-2') || '함께 읽을 자리를 만들고 싶었어요.')+'</blockquote>');
+  const frame = $('body-preview').firstChild;
+  const preview = wrapper(`<article class="slide magazine-card magazine-${style}" ${colors}>${content}<footer><span>03 / 04</span><span>출처 | ${credit(i)}</span></footer></article>`);
+  if (frame.srcdoc !== preview) frame.srcdoc = preview;
+}
+$('logo').onchange = async () => {
+  const file = $('logo').files[0];
+  if (file && (file.size > 5 * 1024 ** 2 || !['image/png','image/jpeg','image/webp'].includes(file.type))) {
+    $('logo').value = '';
+    state.logo = '';
+    showPreview();
+    setStatus('로고는 5MB 이하 JPG, PNG 또는 WebP 파일을 사용해 주세요.');
+    return;
   }
-  const button = document.getElementById('render');
-  button.disabled = true;
-  setStatus('렌더 중입니다… 1~2분 걸립니다.');
+  state.logo = await readFile(file);
+  showPreview();
+};
+let previewTimer;
+document.querySelector('main>section').addEventListener('input', () => {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(showPreview, 100);
+});
+selectStyle(state.style);
+$('render').onclick = () => render(state.style);
+$('compare').onclick = () => render('all');
+
+async function render(selection) {
+  if (!val('displayName') || !val('activity')) { setStatus('표시 이름과 이번 게시물 주제를 입력해 주세요.'); return; }
+  const buttons = [$('render'),$('compare')];
+  buttons.forEach(button => button.disabled = true);
+  setStatus('카드를 만들고 있습니다…');
   try {
+    const videos = state.photos.map((_,i) => i && ['video','all'].includes(selection) ? $(`video-${i}`).files[0] : null);
+    if (videos.reduce((sum,file) => sum + (file?.size || 0),0) > 100 * 1024 ** 2) throw new Error('영상 파일은 합계 100MB 이하로 줄여 주세요.');
+    const slides = await Promise.all(state.photos.map(async (photo,i) => {
+      if (!photo) throw new Error(`${SLOT_LABEL[i]} 사진을 넣어 주세요.`);
+      const common = { photo, description:val(`desc-${i}`), title:val(`title-${i}`), owned:$(`owned-${i}`).checked };
+      return i === 0 ? {...common,eyebrow:val('eyebrow-0')} : {
+        ...common, body:val(`body-${i}`), aside:val(`aside-${i}`),
+        video:await readFile(videos[i]), subtitle:val(`subtitle-${i}`),
+        question:val(`question-${i}`), quote:val(`quote-${i}`),
+      };
+    }));
     const response = await fetch('/api/render', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ activity: val('activity'), slides }),
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({displayName:val('displayName'),topic:val('activity'),slides,selection,
+        logo:state.logo,issue:val('issue'),interview_source:val('transcript')}),
     });
     const data = await response.json();
     if (!data.ok) throw new Error(data.error || '렌더 실패');
     showResults(data);
-    const notes = (data.warnings || []).join(' ');
-    setStatus('완료 — 오른쪽에서 시안을 고르세요.' + (notes ? ' (' + notes + ')' : ''));
-  } catch (error) {
-    setStatus('실패: ' + error.message);
-  } finally {
-    button.disabled = false;
-  }
-};
+    setStatus('완료 · 결과에서 시안을 열고 편집할 수 있습니다. ' + data.warnings.join(' '));
+  } catch (error) { setStatus(error.message || '제작 중 오류가 발생했습니다.'); }
+  finally { buttons.forEach(button => button.disabled = false); }
+}
 
 function showResults(data) {
   const box = document.getElementById('results');
   box.hidden = false;
   box.innerHTML = '';
-  data.editions.forEach((edition, index) => {
+  data.editions.forEach(edition => {
     const column = document.createElement('div');
     column.className = 'card';
     column.innerHTML = `
       <h2>${edition.name}</h2>
-      <div class="thumb">${edition.slides.map(src => `<img src="${src}" alt="${edition.name} 미리보기">`).join('')}</div>
-      <div class="pick">
-        <input type="radio" name="edition" value="${edition.id}" id="ed-${edition.id}" ${index === 0 ? 'checked' : ''}>
-        <label for="ed-${edition.id}">${edition.name} 선택</label>
-      </div>`;
+      <div class="thumb">${edition.slides.map(({poster,video},i) => video
+        ? `<video src="${video}" poster="${poster}" controls muted playsinline preload="metadata" aria-label="${i+1}장 영상"></video>`
+        : `<img src="${poster}" alt="${edition.name} ${i+1}장">`).join('')}</div>
+      <a href="${data.editor}#${edition.id}" target="_blank" rel="noopener">${edition.name} 편집·저장</a>`;
     box.appendChild(column);
   });
   const bar = document.createElement('div');
   bar.className = 'card bar';
-  bar.innerHTML = `
-    <div class="actions">
-      <button class="primary" id="save">선택한 시안 PNG 저장</button>
-      <a href="${data.editor}" target="_blank" rel="noopener">편집기로 열기</a>
-      <span class="hint" id="saveMsg"></span>
-    </div>
-    <details><summary>캡션·해시태그 보기</summary><pre>${escapeHtml(data.caption)}\n\n${escapeHtml(data.hashtags.join(' '))}</pre></details>`;
+  bar.innerHTML = `<details><summary>캡션·해시태그 보기</summary><pre>${escapeHtml(data.caption)}\n\n${escapeHtml(data.hashtags.join(' '))}</pre></details>`;
   box.appendChild(bar);
-
-  document.getElementById('save').onclick = async () => {
-    const checked = document.querySelector('input[name=edition]:checked');
-    const message = document.getElementById('saveMsg');
-    message.textContent = '저장 중…';
-    try {
-      const response = await fetch('/api/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ runId: data.runId, edition: checked.value }),
-      });
-      const result = await response.json();
-      message.textContent = result.ok ? '저장됨: ' + result.folder : '실패: ' + result.error;
-    } catch (error) {
-      message.textContent = '실패: ' + error.message;
-    }
-  };
 }
 </script>
 </body>

@@ -39,6 +39,29 @@ def main():
                     checked.append(path.name)
             except Exception as exc:
                 issues.append(f"{path.name}: {exc}")
+        if feed.get("body_style") == "video":
+            from imageio_ffmpeg import read_frames
+
+            expected_clips = {
+                f"post-{i:02d}-slide-{j:02d}.mp4"
+                for i, post in enumerate(feed["posts"], 1)
+                for j, slide in enumerate(post["slides"], 1)
+                if slide.get("video") and (j > 1 or feed.get("body_only"))
+            }
+            clips = {path.name: path for path in (out / "mp4").glob("*.mp4")}
+            if clips.keys() != expected_clips:
+                issues.append("MP4 files do not match the video cards")
+            for name, path in clips.items():
+                try:
+                    frames = read_frames(str(path))
+                    try:
+                        if next(frames)["size"] != (1080, 1350):
+                            issues.append(f"{name}: expected 1080x1350")
+                        next(frames)
+                    finally:
+                        frames.close()
+                except Exception as exc:
+                    issues.append(f"{name}: {exc}")
         html = (out / "editable/index.html").read_text(encoding="utf-8")
         if html.count('class="slide ') != expected:
             issues.append("HTML slide count does not match feed.json")

@@ -158,7 +158,8 @@
                   "enum": [
                     "institution",
                     "stock",
-                    "generated"
+                    "generated",
+                    "provided"
                   ]
                 },
                 "eyebrow": {
@@ -185,6 +186,31 @@
                   "type": "number",
                   "minimum": 0,
                   "maximum": 100
+                },
+                "aside": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 48
+                },
+                "video": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "subtitle": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "question": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "quote": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 110
                 }
               }
             },
@@ -206,6 +232,26 @@
     "body_only": {
       "type": "boolean",
       "description": "Only article interiors, page numbers start at 02."
+    },
+    "body_style": {
+      "enum": [
+        "playful",
+        "overlay",
+        "video",
+        "interview"
+      ]
+    },
+    "logo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "interview_source": {
+      "type": "string",
+      "maxLength": 20000
+    },
+    "issue": {
+      "type": "string",
+      "maxLength": 30
     }
   },
   "allOf": [
@@ -247,6 +293,20 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "body_style"
+        ]
+      },
+      "then": {
+        "properties": {
+          "style": {
+            "const": "bold-photo-editorial"
           }
         }
       }

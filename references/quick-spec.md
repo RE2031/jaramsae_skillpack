@@ -1,85 +1,49 @@
-# 빠른 계약 (기본 경로)
+# 카드뉴스 빠른 제작 규칙
 
-이 한 장과 마지막의 실행 명령만으로 4장 캐러셀을 만들 수 있다. 아래 "더 읽기"는 예외 상황에서만 연다.
+## 입력과 기본 흐름
 
-## 0. 입력
-- 기관명: 기관 프로필 값 그대로 표기(임의 변경·추가 금지). 프로필은 `profiles/<id>/brand-profile.json`.
-- 활동·반, 사진 4장(표지 + 1~3), 사진별 한 줄 설명. 제목·본문은 선택(없으면 설명에서 만든다).
-- 사진 구분: 기관 제공(공개·동의 확인) / 스톡 / AI 생성. 확인되지 않으면 예시로 표시한다.
-- 실제 아동 사진은 보호자 동의 + 기관 공개 권한 + 외부 AI 전송 권한을 모두 확인한 경우만 쓴다.
+- 표시 이름과 이번 게시물 주제, 표지 사진 1장과 본문용 사진 3장, 카드별 제목·원고를 준비한다. 기존 프로필의 기관명은 표시 이름 기본값으로 쓰고, 화면에서 직접 입력한 값을 우선한다. 프로필 없이도 시작할 수 있다.
+- 사진마다 실제 제공 자료인지 예시 이미지인지 표시한다. 사용 권한과 필요 시 인물 공개 동의를 확인한다. 실제 아동 사진은 보호자 동의, 기관 공개 권한, 외부 AI 전송 권한이 모두 확인된 범위에서 사용한다.
+- 사진은 같은 게시물의 네 스타일에서 공유한다. 선택한 스타일의 입력만 화면에 드러나며 다른 스타일에 입력한 자료도 유지된다. 본문은 인물·주제 소개, 핵심 장면, 결론이나 후속 질문으로 전개할 수 있다.
 
-## 1. 표지 (1장)
-- 1080×1350, 4:5, 풀블리드. 외곽 여백·카드 프레임·밝은 배경 금지.
-- 사진 약 75% / 텍스트 약 25%를 시각 비중 출발점으로 한다.
-- 상단 중앙: 기관명 문자열만 흰색 굵은 HTML 텍스트. 로고·아이콘·심볼·이모지·워터마크·장식 도형 금지(기관이 로고 파일을 제공해도 넣지 않는다).
-- 하단: 도입 문구(eyebrow) 1줄 8~18자 + 흰색 굵은 제목 정확히 2줄(각 10자 내외, `\n` 하나).
-- `body`는 빈 문자열, `details` 없음. 설명은 2장 이후나 캡션에 쓴다.
-- 우측 하단: `출처 | 기관 제공` / `출처 | 예시 이미지` / `출처 | AI 생성`.
-- 제목이 넘치면 글자를 줄이지 말고 카피를 다시 쓴다.
+## 공통 표지
 
-## 2. 본문 (2~4장)
-- 상단 55~65% 큰 사진, 하단 밝은 단색 영역(아이보리/흰색/종이색)에 라벨 → 소제목 2줄 → 본문 2~3문장(≤180자) → 페이지 번호 → 작은 출처.
-- 사진과 글은 겹치지 않는다. 기관명·로고를 반복하지 않는다.
-- 흐름: 2장 놀이의 시작 / 3장 아이들이 해본 일 / 4장 이어진 놀이.
-- 4시안 모두 같은 사진·사실·문구를 쓰고 레이아웃만 다르게 한다.
-- 표지 한 장만 요청받으면 A(Signature)를 기본으로 한다.
+기존 A · Signature 그대로 렌더링한다. 1080×1350 풀블리드 사진, 상단 중앙 표시 이름, 하단 한 줄 도입 문구와 두 줄의 굵은 흰색 제목, 우측 하단 출처를 유지한다. 원고에는 줄바꿈 하나로 제목을 두 줄로 쓰고 본문과 details를 비운다. 제목이 넘치면 두 줄을 짧게 다듬는다. 사진, 크롭, 문구와 배치는 네 스타일에서 동일하다. 표지에는 로고나 장식 도형을 넣지 않는다.
 
-## 3. 카피
-- 확인된 사실만. 발달 효과 단정, 모집 보장, 없는 발언 인용, 과장 금지.
-- 한 장에 메시지 하나. 제목은 사진 묘사가 아니라 그 장면의 의미를 말한다.
-- 스톡·AI 사진이면 캡션에 "사진은 실제 기관 활동을 촬영한 것이 아닌 예시 이미지입니다."를 넣는다.
-- 캡션: 도입 1문장 + 사진 설명 + (예시 고지) + 해시태그.
-- 정보 중심(모집·일정·준비물)이면 `editorial-hybrid`/`minimal-information`을 검토한다. `make_editions.py`는 bold 전용이므로 그때는 `pipeline.py`로 단일 시안을 만든다.
+## 2장 이후의 본문 스타일
 
-## 4. feed.json 최소형
-```json
-{
-  "institution": "햇살숲",
-  "goal": "학부모에게 오늘의 활동 전달",
-  "style": "bold-photo-editorial",
-  "brand": {"primary": "#2E332B", "background": "#F6F1E7", "accent": "#B4843C"},
-  "draft": true,
-  "posts": [{
-    "category": "오늘의 놀이 기록",
-    "purpose": "블록 놀이 기록",
-    "caption": "캡션 본문",
-    "hashtags": ["#햇살숲", "#놀이기록"],
-    "slides": [
-      {"title": "블록으로 만든\n우리들의 마을", "eyebrow": "오늘의 놀이 기록", "body": "",
-       "layout": "fullbleed-photo", "image": "photos/photo-01.jpg", "image_approved": true,
-       "image_kind": "institution", "image_source": "기관 제공", "image_credit": "기관 제공 사진",
-       "image_zoom": 1.15, "image_focus_x": 50, "image_focus_y": 45},
-      {"title": "무엇을 만들지\n먼저 정했어요", "eyebrow": "놀이의 시작", "body": "본문 2~3문장.",
-       "layout": "fullbleed-photo", "image": "photos/photo-02.jpg", "image_approved": true,
-       "image_kind": "institution", "image_source": "기관 제공", "image_credit": "기관 제공 사진"}
-    ]
-  }]
-}
+| 스타일 | 제작 규칙 |
+| --- | --- |
+| A · 아기자기 편집형 | 사진 속 물건과 짧은 문구가 주고받는 듯한 말풍선, 작은 삽화나 스티커를 사용한다. 말풍선은 `aside`에 넣는다. |
+| B · 사진 오버레이형 | 풀블리드 정지 사진 위에 제목·짧은 본문을 배치한다. 모든 본문 카드의 같은 상단 위치에 사용자 로고(`logo`)를 둔다. 로고가 없으면 표시 이름을 쓴다. |
+| C · 영상 매거진형 | 필요한 본문 카드에 한 편의 짧은 영상(`video`, 최대 30초)과 화면 문구·자막(`subtitle`)을 붙인다. 앞뒤 정지 카드가 배경과 결론을 전한다. 사진은 영상 유무와 관계없이 정지 미리보기로 쓰인다. 자막은 영상 전체에 보여주는 한 문구이며 MP4 화면에 합성된다. 자막을 비우면 카드 제목을 쓴다. |
+| D · 인터뷰 지면형 | 작은 발행호(`issue`), INTERVIEW 라벨, 질문(`question`)과 큰 직접 인용(`quote`)을 조합한다. 인물·맥락 → 기억에 남는 답변 → 후속 질문이나 마무리. 인용은 `interview_source`의 연속된 문장을 그대로 쓴다. 원문이 없으면 간접 요약을 본문에 쓴다. |
+
+레퍼런스에서는 편집 방식만 참고한다. 로고, 사진, 사실과 카피는 사용자 브랜드와 제공 자료를 바탕으로 제작한다. 모든 텍스트는 HTML/CSS 레이어에 넣는다.
+
+## feed.json과 기존 데이터
+
+`schemas/feed.schema.json`을 따른다. 표시 이름은 기존 필드 `institution`에 저장한다. 새 카드뉴스의 `style`은 `bold-photo-editorial`이고, 선택한 본문형은 `body_style`의 `playful`, `overlay`, `video`, `interview`로 표시한다. `make_editions.py`는 하나의 입력을 재사용해 요청된 본문형을 지정한다.
+
+- 표지는 `image`, `image_zoom`, `image_focus_x`, `image_focus_y`, `eyebrow`, `title`과 빈 `body`를 쓴다.
+- 본문은 `title`, `body`, `layout`, `image`를 쓴다. 스타일별 필드는 위 표를 따른다.
+- `image`, `logo`, `video`는 feed.json 기준 상대 경로다. 승인된 사진에 `image_approved: true`, 사진 유형에 `image_kind`, 표기에 `image_source`와 `image_credit`를 쓴다. 새 유형 `provided`는 일반 사용자 제공 자료에 적용한다. 저장된 `institution` 사진 유형과 기존 `editorial_variant` 피드는 단일 파이프라인에서 기존 규칙으로 렌더링된다.
+
+## 실행과 검수
+
+```powershell
+python -m pip install -r requirements.txt
+python -m playwright install chromium
+python -X utf8 app/server.py --port 8765
 ```
-- 슬라이드는 필요한 수만큼 같은 모양으로 반복한다(4장 캐러셀이면 4개).
-- `image`는 feed.json 기준 상대 경로. `image_zoom`/`image_focus_*`는 표지에만 적용된다.
-- 전체 필드·enum은 `schemas/feed.schema.json`.
 
-## 5. 실행 (Windows 포함)
-```bash
-export PYTHONIOENCODING=utf-8
-python scripts/make_editions.py output/work/feed.json --out output/four-editions   # 4시안 16장 + editor.html
-python scripts/pipeline.py output/work/feed.json --out output/single               # 단일 시안
+`http://127.0.0.1:8765/`에서 자료를 한 번 입력한 후 **선택한 스타일 만들기** 또는 **4종 비교하기**를 누른다. 결과의 **편집·저장**에서 문구를 수정하고 **선택안 PNG·MP4 저장**을 누른다. 정지 카드는 PNG, 영상 카드는 자막을 합성한 MP4로 저장한다. 파일명 앞의 장 번호가 원래 순서를 나타낸다.
+
+```powershell
+python -X utf8 scripts/make_editions.py output/work/feed.json --out output/four-editions
+python -X utf8 scripts/make_editions.py output/work/feed.json --out output/one-edition --style video
+python -X utf8 scripts/pipeline.py output/work/feed.json --out output/single
+python -X utf8 scripts/export_editor_selection.py selected.html --out output/selected
 ```
-- 출력 폴더는 매번 새 경로. 이미 있으면 실패한다.
-- 완료 조건: 종료 코드 0, PNG가 슬라이드 수와 일치, 모두 1080×1350, `quality_check` `passed: true`, `editor.html` 존재.
-- 실패하면 오류를 읽고 JSON·경로·CSS를 고쳐 재실행한다. 실행 전에는 완료라고 말하지 않는다.
-- `quality_check`는 규격·넘침만 본다. 얼굴·손 가림과 미감은 PNG를 열어 사람이 확인한다.
-- 자동 게시 금지.
 
-## 더 읽기 (해당할 때만)
-| 상황 | 파일 |
-|---|---|
-| 4시안 레퍼런스·디자인 근거 | `references/magazine-editions.md` |
-| 표지 확대·초점·예외 처리 | `references/signature-cover.md` |
-| 본문 디자인 수치 | `references/magazine-body.md` |
-| 최초 기관 설정(6문항) | `skills/institution-onboarding/SKILL.md`, `prompts/onboarding.md` |
-| 카피 톤·문장 길이 규칙 | `skills/editorial-copywriting/SKILL.md` |
-| 편집기 전달·선택 PNG | `skills/editor-delivery/SKILL.md` |
-| 전체 파이프라인 설명 | `skills/instagram-feed-creator/SKILL.md` |
-| 다른 스타일(editorial-hybrid 등) | `references/styles/*.json` |
+새 출력 경로를 사용하고 실제 실행 결과를 확인한다. 공통 표지의 동일성, 1080×1350 규격, 모바일 가독성, 사진 출처를 살핀다. B는 모든 본문 로고 위치, C는 무음 재생과 자막 포함 MP4, D는 원문과 인용문의 일치를 확인한다. 자동 게시하지 않는다.
