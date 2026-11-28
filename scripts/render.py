@@ -25,8 +25,10 @@ def magazine_body(data, post, s, art, sid, page, colors, label, platform, logo, 
     footer = f'<footer><span>{page:02d} / {total:02d}</span><span>출처 | {platform}</span></footer>'
     copy = f'<div class="category">{label}</div><h1>{e(s["title"])}</h1><p>{e(s["body"])}</p>'
     if variant == 'playful':
-        aside = f'<div class="photo-aside">{e(s["aside"])}</div>' if s.get('aside') else ''
-        content = f'<div class="art">{art}</div><span class="spark" aria-hidden="true">✦</span>{aside}<div class="mag-copy">{copy}</div>{footer}'
+        content = (f'<div class="art">{art}</div><div class="mag-copy">'
+                   f'<h1 class="dialogue-opening"><strong class="dialogue-title">{e(s["title"])}</strong>'
+                   f'<em class="photo-aside">{e(s.get("aside", ""))}</em></h1>'
+                   f'<p class="dialogue-reply">{e(s["body"])}</p></div>')
     elif variant == 'interview':
         issue = e(data.get('issue') or f'{display_name(data)} · 01')
         question = f'<div class="interview-question"><b>Q.</b> <span>{e(s["question"])}</span></div>' if s.get('question') else ''
@@ -202,16 +204,22 @@ def magazine_issues(slide):
         if(!card.classList.contains('magazine-card'))return [];
         const bounds=card.getBoundingClientRect();
         const copy=card.querySelector('.mag-copy').getBoundingClientRect();
-        const footer=card.querySelector('footer').getBoundingClientRect();
+        const footer=card.querySelector('footer')?.getBoundingClientRect();
         const issues=[];
-        if(copy.bottom>footer.top+1)issues.push('본문이 바닥글과 겹칩니다');
+        if(footer && copy.bottom>footer.top+1)issues.push('본문이 바닥글과 겹칩니다');
+        if(card.querySelector('.dialogue-opening')){
+            const opening=card.querySelector('.dialogue-title');
+            const reply=card.querySelector('.dialogue-reply');
+            if(!opening.textContent.trim()||!reply.textContent.trim())issues.push('첫 문구와 답글을 모두 입력해 주세요');
+            if(copy.bottom>bounds.top+bounds.height*.30)issues.push('상단 사각 문구를 짧게 다듬어 주세요');
+        }
         if(card.classList.contains('magazine-video')){
             const frame=card.querySelector('.art').getBoundingClientRect();
             if(copy.bottom>frame.top-20)issues.push('제목이나 본문이 영상 영역과 겹칩니다');
             const subtitle=card.querySelector('.video-subtitle');
             if(subtitle && subtitle.getBoundingClientRect().bottom>footer.top-12)issues.push('자막이 바닥글과 겹칩니다');
         }
-        for(const node of card.querySelectorAll('.mag-copy,.issue,.overlay-brand,.photo-aside,.video-subtitle,blockquote')){
+        for(const node of card.querySelectorAll('.mag-copy,.issue,.overlay-brand,.video-subtitle,blockquote')){
             const box=node.getBoundingClientRect();
             if(box.top<bounds.top-1||box.bottom>bounds.bottom+1||box.left<bounds.left-1||box.right>bounds.right+1||node.scrollWidth>node.clientWidth+2)
                 issues.push('잘린 본문 요소: '+(node.className||node.tagName));

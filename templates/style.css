@@ -151,15 +151,20 @@
 .magazine-card footer{width:100%;font-size:25px;padding-top:14px}
 .magazine-card footer span:last-child{font-size:23px}
 
-.magazine-playful{background:#fcf7e9;color:#292224}
-.magazine-playful .art{height:652px;margin:36px 24px 33px 8px;border:10px solid #fffdf8;border-radius:33px;box-shadow:8px 12px 0 #292224;transform:rotate(-2deg)}
-.magazine-playful .mag-copy{margin:21px 26px 0}
-.magazine-playful .category{justify-self:start;border:3px solid currentColor;background:#ffc657;border-radius:30px;padding:7px 22px;font-weight:880;transform:rotate(-3deg)}
-.magazine-playful h1{font-weight:950}
-.magazine-playful .spark{position:absolute;top:46px;left:35px;transform:rotate(12deg);font-size:133px;color:#ffd061;-webkit-text-stroke:3px #292224;line-height:1}
-.magazine-playful .photo-aside{position:absolute;right:50px;top:592px;max-width:560px;padding:19px 31px;border:4px solid #292224;border-radius:40px;background:#fff;box-shadow:7px 8px 0 #f393ad;font-size:38px;font-weight:850;white-space:pre-wrap;overflow-wrap:anywhere}
-.magazine-playful .photo-aside:before{content:"";position:absolute;left:29px;top:-19px;width:27px;height:27px;transform:skew(-17deg) rotate(45deg);background:#fff;border:solid #292224;border-width:4px 0 0 4px}
-.magazine-playful footer{border-top:2px dashed #29222467}
+.magazine-playful{padding:0;background:#343937;color:#101010}
+.magazine-playful .art{position:absolute;inset:0;width:100%;height:100%;border-radius:0;background:#343937}
+.magazine-playful .art img{display:block}
+.magazine-playful .mag-copy{position:absolute;top:9.1%;left:8.7%;right:7.8%;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+.magazine-playful .dialogue-opening,.magazine-playful .dialogue-reply{
+  width:fit-content;max-width:100%;margin:0;padding:11px 21px;
+  border:2px solid #111;background:#fff;color:#111;
+  font-size:29px;line-height:1.38;font-weight:400;letter-spacing:-.65px;
+  white-space:normal;word-break:keep-all;overflow-wrap:anywhere
+}
+.magazine-playful .dialogue-opening strong{font-weight:850}
+.magazine-playful .photo-aside{font-style:normal;margin-inline-start:.25em}
+.magazine-playful .photo-aside:empty{display:none}
+.magazine-playful .dialogue-reply{margin-top:-2px;margin-left:22%;max-width:78%}
 
 .magazine-overlay{isolation:isolate;color:white;background:#14171a}
 .magazine-overlay .art{position:absolute;inset:0;height:100%;border-radius:0;z-index:-2;background:#14171a}

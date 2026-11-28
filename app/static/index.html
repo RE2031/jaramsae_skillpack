@@ -109,7 +109,7 @@ button:disabled{opacity:.6;cursor:wait}
 <script>
 const SLOT_LABEL = ['표지 사진', '본문 1', '본문 2', '본문 3'];
 const styles = {
-  playful: ['A · 아기자기 편집형', '사진 속 물건에 말풍선을 붙여 사진과 문구가 한 장면을 만들게 하세요.'],
+  playful: ['A · 아기자기 편집형', '사진 전체 위에 흰 사각 문구 두 개를 얹습니다. 첫 문구가 질문이나 반응을 던지고, 두 번째 문구가 받아칩니다.'],
   overlay: ['B · 사진 오버레이형', '본문은 사진을 꽉 채우고 같은 상단 위치에 로고나 표시 이름을 넣습니다.'],
   video: ['C · 영상 매거진형', '영상 한 장을 앞뒤 정지 카드 사이에 배치하면 맥락과 결론을 읽기 쉽습니다. 영상이 비어 있으면 사진을 사용합니다.'],
   interview: ['D · 인터뷰 지면형', '인물과 맥락 소개 → 원문에서 가져온 답변 → 후속 질문 또는 마무리'],
@@ -158,7 +158,7 @@ SLOT_LABEL.forEach((label, i) => {
         </div>
         ${i === 0 ? `<div class="field"><label class="lbl" for="eyebrow-0">표지 도입 문구</label><input id="eyebrow-0" type="text" maxlength="18"></div>` : `
         <div class="field"><label class="lbl" for="body-${i}">본문 (비우면 사진 설명 사용)</label><textarea id="body-${i}" maxlength="180"></textarea></div>
-        <div class="field" data-style="playful"><label class="lbl" for="aside-${i}">사진 속 한마디 (선택)</label><input id="aside-${i}" type="text" maxlength="48"></div>
+        <div class="field" data-style="playful"><label class="lbl" for="aside-${i}">첫 문구에 붙일 한마디 (선택)</label><input id="aside-${i}" type="text" maxlength="48"></div>
         <div class="field" data-style="video" hidden><label class="lbl" for="video-${i}">짧은 영상 (선택, 30초까지 사용)</label><input id="video-${i}" type="file" accept="video/*"><label class="lbl" for="subtitle-${i}">영상 자막</label><textarea id="subtitle-${i}" maxlength="100"></textarea></div>
         <div class="field" data-style="interview" hidden><label class="lbl" for="question-${i}">질문 (선택)</label><input id="question-${i}" type="text" maxlength="100"><label class="lbl" for="quote-${i}">직접 인용 (선택)</label><textarea id="quote-${i}" maxlength="110"></textarea></div>`}
         <div class="rowline">
@@ -213,6 +213,10 @@ function selectStyle(id) {
   state.style = id;
   for (const button of $('styles').children) button.setAttribute('aria-pressed', button.dataset.variant === id);
   document.querySelectorAll('[data-style]').forEach(field => field.hidden = field.dataset.style !== id);
+  for (let i=1;i<4;i+=1) {
+    document.querySelector(`label[for="title-${i}"]`).textContent = id==='playful' ? '첫 문구 (굵은 글씨)' : '본문 제목';
+    document.querySelector(`label[for="body-${i}"]`).textContent = id==='playful' ? '두 번째 문구' : '본문 (비우면 사진 설명 사용)';
+  }
   $('style-help').textContent = styles[id][1];
   showPreview();
 }
@@ -254,8 +258,8 @@ function showPreview() {
   const copy = extra => `<div class="mag-copy">${topic}<h1>${headline}</h1><p>${body}</p>${extra || ''}</div>`;
   let content;
   if (style === 'playful') {
-    const aside=val(`aside-${i}`) || (!state.photos[i] && i===2 ? '저부터 읽어보실래요?' : '');
-    content=art + '<span class="spark">✦</span>'+(aside ? '<div class="photo-aside">'+esc(aside)+'</div>' : '')+copy();
+    const aside=val(`aside-${i}`) || (!state.photos[i] && i===2 ? '그게 뭔데…' : '');
+    content=`${art}<div class="mag-copy"><h1 class="dialogue-opening"><strong class="dialogue-title">${headline}</strong><em class="photo-aside">${esc(aside)}</em></h1><p class="dialogue-reply">${body}</p></div>`;
   }
   if (style === 'overlay') content = art + '<div class="media-shade"></div><div class="overlay-brand">'+(state.logo ? `<img src="${esc(state.logo)}" alt="">` : `<span>${brand}</span>`)+'</div>' + copy();
   if (style === 'video') content = copy() + art + ((!state.photos[i] && i===2) || $(`video-${i}`).files.length ? '<div class="video-subtitle">'+esc(val(`subtitle-${i}`) || val(`title-${i}`) || '영상이 담을 한 문장')+'</div>' : '');
@@ -270,7 +274,8 @@ function showPreview() {
       +`<div class="mag-copy">${qa}${topic}<h1>${headline}</h1><p>${body}</p></div>`;
   }
   const frame = $('body-preview').firstChild;
-  const preview = wrapper(`<article class="slide magazine-card magazine-${style}${hasQuote ? ' has-quote' : ''}" ${colors}>${content}<footer><span>0${i+1} / 04</span><span>출처 | ${credit(i)}</span></footer></article>`);
+  const pageFooter = style === 'playful' ? '' : `<footer><span>0${i+1} / 04</span><span>출처 | ${credit(i)}</span></footer>`;
+  const preview = wrapper(`<article class="slide magazine-card magazine-${style}${hasQuote ? ' has-quote' : ''}" ${colors}>${content}${pageFooter}</article>`);
   if (frame.srcdoc !== preview) frame.srcdoc = preview;
 }
 $('logo').onchange = async () => {

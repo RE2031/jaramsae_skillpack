@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 
 TEXT_FIELDS = ['.cover-brand', '.cover-eyebrow', 'h1 span:first-child',
                'h1 span:nth-child(2)', '.cover-credit', '.category', 'h1',
-               'p', 'footer span:last-child', '.photo-aside', '.video-subtitle',
+               'p', 'footer span:last-child', '.dialogue-title', '.photo-aside', '.video-subtitle',
                'header span:first-child', '.overlay-brand span', '.issue', '.interview-question span']
 
 def export(source, out, browser=None, edits=None):
